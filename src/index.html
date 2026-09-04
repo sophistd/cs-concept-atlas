@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>计算机世界 · 概念 · 实体 · 关联</title>
+<style>
+/*@inject style.css*/
+</style></head><body>
+<div id="top">
+  <div id="title">计算机世界<span id="stat"></span></div>
+  <input id="q" placeholder="搜 jQuery、Redis、幂等、B+ 树…"/>
+  <div id="hits"></div>
+  <button class="btn" data-a="groups">只看域</button>
+  <button class="btn" data-a="concepts">展开到概念</button>
+  <button class="btn" data-a="all">全部展开</button>
+  <button class="btn" data-a="fit">适应屏幕</button>
+  <button class="btn on" id="bgraph">关联模式</button>
+</div>
+<div id="stage" class="graph"><svg><g id="vp"><g id="garcs"></g><g id="glinks"></g><g id="gnodes"></g></g></svg></div>
+<div id="side">
+  <div id="mgp">
+    <div id="mghead">
+      <span class="gt">关联图谱</span><span id="mgc"></span>
+      <span class="ghops" id="mghops">
+        <button class="gb" data-h="1" title="只看直接关联">1</button><button class="gb" data-h="2" title="再往外一跳">2</button><button class="gb on" data-h="3" title="再往外两跳">3</button>
+      </span>
+      <button class="gb" id="mgadd" title="把某个节点钉进这张图（它不在跳数范围内也照画）">＋</button>
+      <button class="gb" id="mgbun" title="调一组现成的组合出来看">组合</button>
+      <button class="gb" id="mgbig" title="放大 / 收起（Esc 收起）">⤢</button>
+    </div>
+    <div id="mgbar"></div>
+    <div id="mgwrap">
+      <svg id="mgsvg">
+        <defs><marker id="mgarr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5.5" markerHeight="5.5" orient="auto"><path d="M0,1L7,4L0,7z" fill="#3B6FA0"/></marker></defs>
+        <g id="mgvp"><g id="mge"></g><g id="mgn"></g></g>
+      </svg>
+      <div id="mgempty"></div>
+      <div id="mgpop"></div>
+    </div>
+    <div id="mgfoot">
+      <span class="mgk on" data-k="same"><i style="border-color:#E8590C"></i>同类 · 可替代</span>
+      <span class="mgk on" data-k="pair"><i style="border-color:#2F7D74"></i>固定搭配</span>
+      <span class="mgk on" data-k="dep"><i style="border-color:#3B6FA0"></i>底座 · 之上</span>
+      <span class="mgk on" data-k="tree"><i style="border-color:#C7C2B8"></i>罩住</span>
+      <span class="mgnote">×N＝散在 N 处　·　⌥/Alt＋点＝摘掉</span>
+      <span id="mgmore"></span>
+    </div>
+  </div>
+  <div id="card"></div>
+</div>
+<div id="mgtip"></div>
+<div id="legend">
+  <b>读法</b>　<span class="dot f"></span>实心＝里面还有　<span class="dot"></span>空心＝已展开或到底　
+  <span style="color:var(--or)">○</span> 橙圈＝这个节点有跨罩子的关联<br>
+  点圆点＝展开收起　·　点文字＝选中，右栏出详情与关联图谱<span class="dsh"></span>　·　拖动平移　·　滚轮缩放　·　Esc 清空
+</div>
+<script>
+/*@inject data*/
+/*@inject bundles*/
+/*@inject icons.js*/
+/*@inject tree.js*/
+/*@inject graph.js*/
+/*@inject boot.js*/
+</script></body></html>

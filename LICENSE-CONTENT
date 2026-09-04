@@ -1,0 +1,26 @@
+# 内容许可 · Content License
+
+本仓库里的**代码**（`src/`、`build.mjs`、`scripts/`）按根目录的 `LICENSE`，即 MIT。
+
+本仓库里的**内容**——即 `data/concepts.json` 中那 1739 个节点的中文释义、
+分类判据、关系标注，以及由它们生成的 `dist/index.html` 里的对应文本——
+不是代码，是创作。它按下面这条：
+
+    Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
+
+    完整条款：https://creativecommons.org/licenses/by-sa/4.0/legalcode
+    通俗摘要：https://creativecommons.org/licenses/by-sa/4.0/
+
+意思是：你可以拿去用、改、商用，但要**署名**，并且改完之后**得用同一个许可放出来**。
+
+---
+
+## Summary in English
+
+Code in this repository (`src/`, `build.mjs`, `scripts/`) is MIT licensed — see `LICENSE`.
+
+The dataset in `data/concepts.json` — the 1739 nodes with their Chinese
+explanations, classification criteria and relation labels — is authored
+content, not code. It is licensed under
+**Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)**.
+Full text: https://creativecommons.org/licenses/by-sa/4.0/legalcode
