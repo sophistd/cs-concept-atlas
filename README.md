@@ -5,7 +5,9 @@
 >
 > *An offline, single-file atlas of computing concepts and their real-world instances, in Chinese.*
 
-**[⬇︎ 下载 `index.html`](index.html) 双击打开就行**，不需要服务器、不需要联网。
+### 👉 **[打开：sophistd.github.io/cs-concept-atlas](https://sophistd.github.io/cs-concept-atlas/)**
+
+或者 **[下载 `index.html`](index.html) 双击打开** —— 整张图就是这一个文件，不需要服务器、不需要联网。
 
 ---
 
