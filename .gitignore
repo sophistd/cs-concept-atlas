@@ -1,3 +1,8 @@
 .DS_Store
 node_modules/
 scripts/bundle-candidates.json
+
+# ── 本地开发文档，不进公开仓库 ──────────────────────────
+# spec / plan / 交接 都在这儿。它们是给维护者和 agent 看的工作文档，
+# 不是给来客看的：来客看 README（怎么用）和 intent.md（为什么这样）。
+_local/
