@@ -1,154 +1,128 @@
-# 计算机世界 · 概念 · 实体 · 关联
+# CS/SE 导航地图
 
-> 一张能翻的计算机知识地图：**24 个域 · 275 个概念 · 1420 个实体 · 610 条关联**。
-> 单个 HTML 文件，无构建依赖、无网络请求，双击就能看。
->
-> *An offline, single-file atlas of computing concepts and their real-world instances, in Chinese.*
+为通过 AI、Coding Agent、Vibe Coding 进入编程领域的人，提供一张计算机与软件工程地图：**发现原本不知道的东西，看清位置、分工和关系，再找到具体项目与资料。**
 
-### 👉 **[打开：sophistd.github.io/cs-concept-atlas](https://sophistd.github.io/cs-concept-atlas/)**
+当前首页沿用原有的**可折叠树＋关联图**。点击领域、概念或最底层条目，右侧可查看定位、解释、相关资料与相邻概念。三入口设计保存在独立样板中，继续作为讨论材料。
 
-或者 **[下载 `index.html`](index.html) 双击打开** —— 整张图就是这一个文件，不需要服务器、不需要联网。
+| 入口 | 用途 |
+|---|---|
+| **[地图首页 · index.html](index.html)** | 按领域逐层探索，阅读节点解释与来源，查看跨领域关联。 |
+| [三入口设计样板 · design/index.html](design/index.html) | 审阅软件组成、全域、产品三条路径；“保存和查找信息”是完整样板。 |
 
----
+**[在线打开地图](https://sophistd.github.io/cs-concept-atlas/)**，或下载根目录 HTML 离线阅读。网站由 GitHub Pages 从 `main` 分支根目录发布；本地构建不代表已发布到线上。本次发布范围与验收见 [intent.md 第 11 节](intent.md#11-现有全景新版公开更新2026-09-06)，模块与构建地图见 [CLAUDE.md](CLAUDE.md)。
 
-## 它想解决的问题
+## 打开项目
 
-市面上讲「技术栈」的图，几乎都是分类树：一个东西挂在一个格子里，讲完就完了。
+**直接双击根目录 `index.html` 即可。** 正文、来源记录、样式和脚本都内联在 HTML 里，离线可读；点击外部资料才需要联网。`src/index.html` 是模板，不能直接打开。
 
-但真实的知识不是这样的。**同一个东西常常同时属于好几个格子** —— `DOM 树` 既是数据结构里的
-「树」，也是浏览器渲染流程的产物，还是 React 底下被操作的那个对象。这三个身份都对，
-而**树状图画不出来**：一个节点只能有一个爹。
-
-所以这份图有两层：
-
-| 层 | 是什么 | 怎么看 |
-|---|---|---|
-| **树** | 域 罩住 概念，概念 罩住 实体 | 左边那棵，点圆点展开收起 |
-| **关联** | 跨罩子的边 —— 树里画不出来的那些 | 右边的**关联图谱**，以选中节点为圆心往外铺 |
-
-八种关联，压成三根轴：
-
-```
-相似轴   同一个东西 · 同一类的东西 · 可以互相替代      橙
-共现轴   固定搭配                                   青
-层叠轴   底下用的是 · 被谁当底座 · 跑在……之上 · 跑在它之上的   蓝（带箭头，指向被依赖的那头）
-```
-
-## 关联图谱怎么读
-
-右栏那块面板以**选中的节点为圆心**，按跳数往外铺最多三圈。**一跳 = 一条关系**，
-三跳 = 关系的关系的关系 —— 再远就没有可读性了。
-
-- **`1 / 2 / 3`** 铺几圈
-- **`⤢`** 放大到整屏（`Esc` 收起）。侧栏那块只画得下 25 个点，hub 节点得放大才看得全
-- **`×N` 徽标** —— 这个东西**散在 N 个概念下**。图谱里它是一个点（否则 React 周围会冒出
-  4 个 `JavaScript`），悬停能看到它的 N 个落点，点它跳回树里
-- **节点上的图标 = 它属于哪个域**，24 个域各一个（来自 [Lucide](https://lucide.dev)）。
-  一圈扫过去，哪些是前端、哪些是数据库、哪些是基础设施，不用读字就看得出来
-- 悬停会把不相干的线压暗，只留这个节点身上挂着的那些
-
-### 一团乱麻的时候，三个办法
-
-hub 节点（React、npm、JavaScript 这种）三跳能扯出七八十个东西。所以图是可以**裁**的：
-
-| 手 | 干什么 | 力度 |
-|---|---|---|
-| **点图例上的色块** | 关掉一整族关系 | 最大。以 React 为心实测：全开 43 条边 → 关掉「罩住」34 条 → 再关「同类·可替代」31 条 → 再关「固定搭配」只剩 16 条 |
-| **`⌥`/`Alt` ＋ 点节点** | 把这一个点摘掉 | 单点。摘掉的位置会让给原本没画下的节点 |
-| **`＋` 按钮** | 把某个点钉进来 | 单点。**跳数够不着也照画** —— 想看「Kubernetes 跟 React 之间到底有没有关系」，钉进来就知道了：没有线就是没关系 |
-
-改过之后头上会出现一条状态（`钉住 2 · 摘掉 1 · 还原`），**按「还原」全部退回去**。
-
-### `组合` —— 21 组现成的
-
-按跳数漫游适合「从这一个出发看看周围」，不适合「我想一次看清云原生那一坨」。
-所以内置了 21 组：**点 `组合`，图上就只画这一组**，不再按跳数铺。
-
-```
-JavaScript 生态 27 · 云原生那一套 24 · Python 与模型训练 17 · 存储引擎底下的数据结构 16
-静态类型这一派 14 · 关系型数据库 14 · 网络协议栈与加密 11 · 网页三件套与 DOM 10
-版本控制与流水线 10 · 缓存与局部性 10 · 向量检索与 RAG 10 · Transformer 与算力 10
-认证与摘要 9 · 函数式与所有权 8 · 消息与事件流 7 · C 与 Linux 底座 6 · 并发原语 6
-反向代理与负载均衡 5 · UDP 那一支 5 · 虚拟内存 4 · 模型压缩与本地推理 4
-```
-
-**这些组不是手划的，是算出来的** —— 在关联图上跑 Louvain 模块度聚类，
-边权按「这条关系有多说明两个东西在一起用」给（`固定搭配` 3 分、层叠关系 2 分、
-`可以互相替代` 0.3 分）。为什么不能直接用连通分量：整张关联图是**一个 190 点的巨块**
-横跨 6 个域，外加 15 个 2~4 点的碎渣 —— 连通性切不出任何东西。
-
-组名和成员都在 `data/bundles.json` 里，**改名直接改 JSON**。要重新切簇：
+开发或浏览器验收时，在仓库目录运行：
 
 ```bash
-python3 scripts/find-bundles.py 1.4     # 先看看不同分辨率切出什么（只打印）
-python3 scripts/make-bundles.py 1.4     # 定稿，写回 data/bundles.json
+python3 -m http.server 8792 --bind 127.0.0.1
 ```
 
-> `bundles.json` 按**下标**引用节点，数据一增删下标就会整体错位，而且是静默的。
-> 所以每条成员同时存了名字，`build.mjs` 每次构建都核对一遍，对不上直接报错不出包。
+打开 [当前地图首页](http://127.0.0.1:8792/index.html)。终端保持运行；按 `Ctrl+C` 停止服务后，刷新将无法连接。如果已有这个项目的服务，直接访问即可。
 
-## 数据长什么样
-
-`data/concepts.json` 是唯一的数据正本，一个扁平数组，靠下标互指：
-
-```jsonc
-{
-  "i": 1148,              // 下标，就是它在数组里的位置
-  "n": "React",           // 名字
-  "e": "",                // 英文名（可空）
-  "g": "",                // 一句话释义
-  "t": "item",            // root | group | concept | item | contrast
-  "d": 3,                 // 深度 0-3
-  "p": 1147,              // 父节点下标
-  "c": [],                // 子节点下标
-  "m": "2013 年 Facebook 放出来的……",   // 长释义（可空）
-  "r": [                  // 跨罩子的关联
-    [1141, "底下用的是"],
-    [728,  "跑在……之上"]
-  ]
-}
-```
-
-**反向关系是成对写的**：`A 底下用的是 B` 的另一头写作 `B 被谁当底座 A`。
-渲染时会折成一条有向边（`src/graph.js` 里的 `MINV`），所以不用担心画重。
-
-## 怎么改
+修改源码或内容后先构建，再刷新：
 
 ```bash
-node build.mjs            # src/ + data/ → index.html
-node build.mjs --watch    # 改了就重建
+node build.mjs          # 生成根目录 index.html
+node build.mjs --watch  # 监视 src/、data/ 与 data/entries/；浏览器手动刷新
 ```
 
-拆成多文件只是**为了改得动**，交付形态始终是那一个自包含的 `index.html`。
+不需要 `npm install`，没有后端、数据库、CDN 或浏览器运行时依赖。两个构建脚本只用 Node 标准库。
 
-```
-src/index.html   骨架 + 注入点
-src/style.css    样式
-src/tree.js      左边那棵树：布局 / 折叠 / 搜索 / 缩放
-src/graph.js     右栏关联图谱：并查集合并 / BFS 铺圈 / 径向布局 / 标签避让 / 加减 / 组合
-src/icons.js     24 个域的图标几何数据（生成物，别手改）
-src/boot.js      启动
-data/concepts.json   数据正本
-data/bundles.json    21 组现成的组合
-build.mjs        内联成单文件（零依赖，只用 node 标准库）
-scripts/         一次性的工具：切簇、抠图标。平时不用跑
-```
+## 首页怎么读
 
-`scripts/` 里的两个脚本产出的都是**已提交的产物**，只有要重切组合、
-或者换图标/升 lucide 版本时才需要跑：
+- 点圆点展开或收起，点名称查看说明。键盘聚焦节点后，Enter 看说明，左右方向键展开或收起。
+- 搜索概念或项目，按 Enter 定位同名节点；没有同名节点时定位第一个命中。地址中的 `#node=编号` 可保存和分享。
+- 右侧“怎样理解”讲机制、情境或边界；“资料与继续阅读”进入官方文档或相关资料。“展开阅读”让说明占满侧栏，“显示关联图”恢复图谱。
+- 图谱的 `1 / 2 / 3` 控制关系跳数，`⤢` 放大。`×N` 表示同一对象在多个位置出现；详情也能跳到其他位置。
+- 点击图例开关关系；`⌥` / `Alt` 加点击摘除单点；`＋` 钉入节点；“还原”恢复筛选。“组合”展示已有的 21 组主题成员。
+- Esc 按顺序关闭弹层、退出图谱放大、清空主搜索。树图与图谱可拖动平移、滚轮缩放；窄屏的说明排在树图下方，可正常滚动阅读。
+
+分类、组合和旧关系是持续整理的内容。“同类”不等于能直接替换；图谱中的比较线索仍需核对接口、环境和需求。没有画出关系也不等于现实中不存在关系。
+
+## 内容完成到什么程度
+
+`data/entries/` 为每个非根节点提供定位、解释与相关资料，包括最底层条目。构建要求全覆盖，缺失节点、错位编号、重复条目或失效引用会阻止生成。
+
+**基础解释覆盖与事实审核是两件事。** 来源上的“页面核对”只记录确实打开核对过的页面；未核对的来源显示“参考链接 · 尚待逐页核验”。HTTP 可访问不证明页面支撑某个结论。维护者还需审阅解释、概念边界与旧关系。
+
+源文件职责：
+
+| 位置 | 正本与职责 |
+|---|---|
+| `src/index.html`、`src/style.css` | 页面结构与布局。 |
+| `src/tree.js`、`src/graph.js` | 分类导航与跨领域关联。 |
+| `src/details.js` | 唯一详情渲染器：正文、来源、所在位置与关系。 |
+| `src/icons.js`、`src/boot.js` | 内联图标、启动与尺寸变化处理。 |
+| `data/concepts.json` | 分类与原关系身份，节点通过数组下标互指；旧 g/m 保留作沿革。 |
+| `data/entries/*.json` | 当前首页的逐节点正文和来源；node/name 双重核对归属。 |
+| `data/bundles.json` | 已采用组合与人工名称，成员以编号和名称引用。 |
+| `scripts/content.mjs` | 内容完整性、身份、引用校验与浏览器快照编译。 |
+| `drafts/` | 历史长释义，合并回旧库；不会覆盖当前 entries 正文。 |
+| `design/` | 独立设计样板及其内容、来源与验证；不作为当前首页正文正本。 |
+
+相同名称不自动合并。只有原关系明确标为“同一个东西”的节点共享代表节点的基础说明，其他位置的解释作为领域语境补充保留。详情列出其他落点和两类说明所用的资料。
+
+## 检查与维护
 
 ```bash
-python3 scripts/make-bundles.py       # → data/bundles.json（要 networkx）
-node scripts/extract-icons.mjs        # → src/icons.js（要本地有 lucide-react）
+node build.mjs --check               # 全覆盖、引用、内联脚本语法、生成物同步
+node scripts/content-checks.mjs      # 内容守卫拒绝坏数据及正文复用边界
+node scripts/reading-checks.mjs      # 阅读、语境搜索与来源合并回归
+node scripts/graph-checks.mjs        # 交互事件状态回归
+python3 scripts/maintenance-checks.py # 临时目录执行真实维护 CLI，不改正式数据
 ```
 
-改数据就改 `data/concepts.json`，改完 `node build.mjs`。**不要直接改 `index.html`** ——
-下一次构建会把你的改动盖掉。
+图形尺寸、浏览器原生行为与触屏还需在真实页面验收，脚本检查不能替代。
 
-## 许可
+历史草稿合并：
 
-- **代码**（`src/` `build.mjs` `scripts/`）：MIT，见 [`LICENSE`](LICENSE)
-- **图标**：[Lucide](https://lucide.dev)，ISC —— 24 个域各一个，几何数据内联在 `src/icons.js`
-- **内容**（`data/concepts.json` 里的释义与关系标注）：CC BY-SA 4.0，见 [`LICENSE-CONTENT`](LICENSE-CONTENT)
+```bash
+python3 scripts/merge-drafts.py --check
+python3 scripts/merge-drafts.py
+python3 scripts/merge-drafts.py --approve 53 209  # 明确审核后批准指定正文
+```
 
-两者分开是有意的：代码你随便拿；那 1739 条释义是写出来的东西，拿去改可以，**请署名，并且用同一个许可放出来**。
+未变的正文保留审核状态；新正文或修改过的正文重新标为草稿。当前可见正文请修改 `data/entries/`。
+
+调整组合先生成候选，避免覆盖人工命名：
+
+```bash
+python3 scripts/find-bundles.py 1.4  # 只打印聚类结果
+python3 scripts/make-bundles.py 1.4  # 仅生成 data/bundles.candidate.json
+# 核对候选名称、说明和成员，将 reviewed 改为 true，再明确应用：
+python3 scripts/make-bundles.py --apply data/bundles.candidate.json
+node build.mjs
+```
+
+已有候选拒绝覆盖；只有完整成员匹配才保留已有名称，新组合留空待命名。候选生成后若原数据已变化，应用会拒绝。聚类工具需 Python `networkx`，浏览地图无需它。图标更新使用 `node scripts/extract-icons.mjs`，需本地 `lucide-react`，平时不用运行。
+
+## 三入口设计与参考
+
+[设计样板](design/index.html)仍保留原有的三条验证路径：软件组成、数据库领域、需要保存记录的网页应用，最后进入同一 SQLite 或 PostgreSQL 资源卡。相关结构和读者验收见 [design/review.md](design/review.md)。
+
+```bash
+node design/build.mjs
+node design/build.mjs --check
+node design/checks.mjs
+```
+
+本轮参考这些项目的组织方法，未复制其内容库：
+
+| 项目 | 借鉴的做法 |
+|---|---|
+| [OSINT Framework / Mission Intelligence](https://github.com/JeanDevenish/OSINT_Framework_Mission_Intelligence) | 逐层探索并走向具体资源，领域与用途可有不同入口。 |
+| [roadmap.sh](https://roadmap.sh/computer-science) | 节点可继续阅读，地图与学习资料连接。 |
+| [MDN Curriculum](https://developer.mozilla.org/en-US/curriculum/) | 分层整理主题与相关资料，交代知识范围。 |
+| [CS 自学指南](https://csdiy.wiki/) | 对课程、工具和资料给出定位，帮助决定从哪里继续了解。 |
+
+## 参与共建与许可
+
+欢迎补资源、修分类、改解释、补关系与纠错。先看 [CONTRIBUTING.md](CONTRIBUTING.md)，提交 PR 由维护者审核。定位或对象模型变化先讨论；普通内容修正可以直接提交。
+
+代码采用 [MIT](LICENSE)，原创解释、分类与关系采用 [CC BY-SA 4.0](LICENSE-CONTENT)。[Lucide](https://lucide.dev) 图标采用 ISC。第三方资料仍依其自身许可。
+
+[PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md

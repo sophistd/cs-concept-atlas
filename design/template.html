@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<!--
+[INPUT]: 本目录样式、view.js、核实内容与原型的域名称，由 build.mjs 内联。
+[OUTPUT]: 三入口导航样板与可访问的首页结构，不加载外部运行时资源。
+[POS]: 设计样板的语义骨架；资源正文由共享内容库渲染。
+[PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>计算机世界 · 导航设计样板</title>
+  <style>/*@inject style.css*/</style>
+</head>
+<body>
+  <a class="skip" href="#main">跳到主要内容</a>
+  <header class="masthead">
+    <a class="wordmark" href="#home"><span class="mark" aria-hidden="true">[·]</span>计算机世界<span class="wordmark-en">CS / SE ATLAS</span></a>
+    <span class="edition">首轮设计样板</span>
+    <a class="legacy" href="../index.html">原有全景原型 ↗</a>
+  </header>
+  <nav class="entry-nav" aria-label="地图入口">
+    <a href="#home" data-entry="home"><span>01</span>软件由什么组成</a>
+    <a href="#domains" data-entry="domains"><span>02</span>全域地图</a>
+    <a href="#products" data-entry="products"><span>03</span>按产品探索</a>
+  </nav>
+  <main id="main" tabindex="-1"></main>
+  <footer class="site-foot">
+    <p>全景仍在整理。本轮完整展开「保存和查找信息」，来源核对不等于完成读者验证。</p>
+    <div><a href="review.md">设计说明</a><a href="sources.md">来源记录</a><a href="../CONTRIBUTING.md">一起完善这张地图 ↗</a></div>
+  </footer>
+  <template id="home-template">
+    <section class="page-heading">
+      <p class="eyebrow">从你做出来的软件开始</p>
+      <h1>先看懂，它由什么组成。</h1>
+      <p class="intro">从一个部件出发，认识它的分工，再找到具体的框架、工具与资料。</p>
+    </section>
+    <div class="home-layout">
+      <section class="composition" aria-labelledby="composition-title">
+        <div class="section-label"><h2 id="composition-title">运行中的软件</h2><span>点部件，看看它负责什么</span></div>
+        <div class="software-map">
+          <svg class="connections" viewBox="0 0 760 360" preserveAspectRatio="none" aria-hidden="true">
+            <defs><marker id="arrow" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M1 1L6 4L1 7" fill="none" stroke="currentColor"/></marker></defs>
+            <path class="connection" d="M198 115H277"/>
+            <path class="connection" d="M468 115H562"/>
+            <path class="connection" d="M375 163V205"/>
+          </svg>
+          <span class="edge-label edge-ui">操作 / 响应</span><span class="edge-label edge-data">写入 / 查询</span>
+          <button class="part part-interface" data-role="interface"><span class="part-no">01</span><strong>界面与入口</strong><small>人怎样使用它</small></button>
+          <button class="part part-logic" data-role="logic"><span class="part-no">02</span><strong>程序逻辑</strong><small>收到操作后做什么</small></button>
+          <button class="part part-storage selected" data-role="storage" aria-pressed="true"><span class="part-no">03 <span class="sample-dot">本轮样板</span></span><strong>保存和查找信息</strong><small>信息放在哪，怎样取回来</small></button>
+          <button class="part part-network" data-role="network"><span class="part-no">04</span><strong>与其他系统协作</strong><small>通过接口交换信息</small></button>
+          <button class="runtime" data-role="runtime"><strong>05　运行环境</strong><span>操作系统、运行时、托管平台，为需要的部件提供支持</span><b aria-hidden="true">↗</b></button>
+        </div>
+        <p class="map-note">这是一种常见的组织方式。脚本、本地应用、网页应用，会用到不同的部件。</p>
+      </section>
+      <aside id="role-inspector" class="role-inspector" aria-live="polite"></aside>
+    </div>
+    <section class="workshop" aria-labelledby="workshop-title">
+      <div class="workshop-heading"><p class="eyebrow">制作过程中的工具</p><h2 id="workshop-title">它们帮助你把软件做出来。</h2><p>与上面的运行部件分开看。</p></div>
+      <div class="workshop-tools">
+        <button data-role="agent"><span>表达与实现</span><strong>人与 Coding Agent</strong><small>说明目标，生成并修改代码</small></button>
+        <button data-role="editor"><span>编辑与调试</span><strong>开发工具</strong><small>查看代码，观察实际运行</small></button>
+        <button data-role="testing"><span>检查与验证</span><strong>测试工具</strong><small>检查结果是否符合预期</small></button>
+        <button data-role="delivery"><span>记录与交付</span><strong>版本与发布工具</strong><small>保存变化，让软件可被使用</small></button>
+      </div>
+    </section>
+  </template>
+  <noscript><p class="noscript">此交互样板需要启用 JavaScript。文字与来源也可在 <a href="review.md">设计说明</a>和 <a href="sources.md">来源记录</a>中阅读。</p></noscript>
+  <script>
+/*@inject catalog*/
+/*@inject view.js*/
+  </script>
+</body>
+</html>

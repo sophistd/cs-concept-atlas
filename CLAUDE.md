@@ -1,36 +1,62 @@
-# CLAUDE.md
+# CS/SE 导航地图 — 从软件部件发现计算机世界与具体资源
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+原生 JavaScript + SVG + JSON + Node 标准库构建；交付自包含 HTML。
 
-> L2 | 父级: `~/Code/CLAUDE.md` | 交付形态是**一个自包含的 HTML 文件**
+> L1 项目地图。当前决定以 `intent.md` 为准；新设计样板与既有全景原型并存。
+
+## 当前边界与目录
+
+当前首页保留原有可折叠树与关联图。每个非根节点由 data/entries 提供定位、解释与资料入口；基础内容覆盖不等于完成事实审核。三入口设计保留在 design/ 供继续讨论，尚不替代首页。允许外链、产品入口与解释类贡献；本地内容保持离线可读。
+
+| 位置 | 职责 |
+|---|---|
+| `design/` | 独立设计样板、共享内容、官方来源、贡献模板与校验；先读 `design/CLAUDE.md`。 |
+| `src/` | 全景的页面、树、独立详情、关联图、图标与启动源码；先读 src/CLAUDE.md。 |
+| `data/` | 分类与组合保留数组下标；entries/ 按领域维护当前解释和来源。 |
+| `drafts/` | 历史长释义草稿，合并后写回旧数据；当前页面正文以 entries/ 为准。 |
+| `scripts/` | 内容编译与回归检查、草稿合并、组合候选和图标提取。 |
+| `index.html`、`build.mjs` | 既有原型的生成产物与内联构建，产物提交入库，不手改。 |
+| `intent.md` | 现行产品与共建决定；§9 为维护讨论约定，§10 为提案与待决问题，§11 记录现有新版发布范围与验收；历史说明留在 `design/previous-intent.md`。 |
+| `README.md`、`CONTRIBUTING.md` | 启动与审阅入口、公开贡献与维护者审核规则。 |
+| `LICENSE`、`LICENSE-CONTENT` | 代码与原创内容的许可边界。 |
+
+全景正文维护于 `data/entries/*.json`，通过 node/name 校验与原分类相连；显式“同一个东西”关系复用代表节点正文，其余落点的补充说明单独显示。样板内容维护于 `design/content.json`。`design/build.mjs` 读取旧库的域名称与定位生成全景入口，不向旧库写入。样板的 `#入口/storage/资源ID` 路由改变入口语境，资源详情仍由同一条目生成。以下底层技术说明仅针对既有全景。
 
 ## 命令
 
 ```bash
-node build.mjs            # src/ + data/ → index.html
+node design/build.mjs          # 独立生成 design/index.html
+node design/build.mjs --check  # 样板结构、脚本语法及产物同步，只读
+node design/checks.mjs         # 内容校验器的拒绝用例
+node build.mjs            # src/ + 分类/组合 + entries/ → index.html
+node build.mjs --check    # 内容全覆盖、引用、脚本语法与产物同步
+node scripts/content-checks.mjs
+node scripts/reading-checks.mjs      # 阅读、语境搜索与来源合并回归
+node scripts/graph-checks.mjs
+python3 scripts/maintenance-checks.py
 node build.mjs --watch    # 改了就重建（60ms 防抖）
 
-# 语法自检（没有 lint，这是唯一的静态检查）
-node --check <(sed -n '/^<script>$/,/^<\/script>$/p' index.html | sed '1d;$d')
-
-# 看效果：file:// 会被 Chrome 扩展拒绝，走本地 http
-python3 -m http.server 8792   # 然后开 http://localhost:8792/index.html
+# 浏览器审阅走本地 HTTP；保持进程运行，避免刷新时无法连接
+python3 -m http.server 8792 --bind 127.0.0.1
+# 当前首页：http://127.0.0.1:8792/index.html
+# 设计样板：http://127.0.0.1:8792/design/index.html
 ```
 
-`scripts/` 下两个脚本产出的都是**已提交的产物**，平时不跑，只有重切组合 / 换图标时才跑：
+聚类与图标提取平时不跑，只有调整组合 / 换图标时使用：
 
 ```bash
 python3 scripts/find-bundles.py 1.4   # 只打印，看不同分辨率切出什么
-python3 scripts/make-bundles.py 1.4   # 定稿 → data/bundles.json（要 networkx）
+python3 scripts/make-bundles.py 1.4   # 仅生成 bundles.candidate.json（要 networkx）
+# 核对候选的名称、说明和成员，将 reviewed 设为 true 后才可应用：
+python3 scripts/make-bundles.py --apply data/bundles.candidate.json
 node scripts/extract-icons.mjs        # → src/icons.js（要本地有 lucide-react）
 ```
 
-**没有测试、没有 lint、没有 package.json。** `build.mjs` 只用 node 标准库，别为了一个功能引依赖——
-产物必须能离线双击打开，任何运行时依赖都会破坏这一点。
+**没有 package.json 或 lint 配置。** 两个构建都只用 Node 标准库；新样板有内容校验与对应拒绝用例。产物必须自包含，不引入外部运行时依赖。
 
 ## 交付形态决定了一切约束
 
-产物是**一个文件**：`index.html`，274KB，双击就能开，不联网、不请求任何外部资源。
+既有产物是根目录 `index.html`；本轮新增产物是 `design/index.html`。两者各自自包含，加载页面时不请求外部资源，主动打开资料链接时才联网。
 拆成 `src/` 多文件**只是为了改得动**，不是为了让浏览器分开加载。
 
 由此推出三条硬约束：
@@ -39,7 +65,7 @@ node scripts/extract-icons.mjs        # → src/icons.js（要本地有 lucide-r
    图标就是这么处理的（`scripts/extract-icons.mjs` 从本地 lucide-react 抠几何数据写进 `src/icons.js`）。
 2. **`index.html` 是产物，不要手改。** 下一次 `node build.mjs` 会盖掉。
    `index.html` **确实提交进版本库**（要让人能直接下载），所以改完 `src/` 记得重建再提交，否则两者不同步。
-3. 改数据改 `data/concepts.json`，不改 dist。
+3. 分类和关系改 `data/concepts.json`，全景正文和链接改 `data/entries/*.json`；设计样板内容改 `design/content.json`，分别运行对应构建。本仓库不使用 `dist/`。
 
 ## 构建：注入式，不是打包器
 
@@ -50,10 +76,10 @@ node scripts/extract-icons.mjs        # → src/icons.js（要本地有 lucide-r
 注入顺序就是执行顺序，**不能乱**：
 
 ```
-data → bundles → icons.js → tree.js → graph.js → boot.js
+data → content → bundles → icons.js → tree.js → details.js → graph.js → boot.js
 ```
 
-## ⚠️ 四个 JS 文件共享同一个全局词法作用域
+## ⚠️ 五个 JS 文件共享同一个全局词法作用域
 
 **没有模块、没有 import/export。** 它们被内联进同一个 `<script>`，靠顶层 `const`/`function`
 进入全局词法环境互相看见。这意味着：
@@ -64,10 +90,11 @@ data → bundles → icons.js → tree.js → graph.js → boot.js
 
 | 方向 | 依赖的符号 |
 |---|---|
-| `graph.js` → `tree.js` | `N` `NS` `FAM` `mc` `ease` `lerp` `crumb` `esc` `txt` `goto` |
-| `tree.js` → `graph.js` | `mgShow`（`paint()` 末尾调用，图谱靠它跟着选中节点走）· `mgPop` `mgToggleBig`（Esc 处理里） |
+| `graph.js` → `tree.js` / `details.js` | `N` `NS` `FAM` `mc` `ease` `lerp` `crumb` `txt` `goto`；`esc` 由详情提供 |
+| `details.js` → `graph.js` | `mgShow`（`paint()` 末尾调用，图谱跟随选择） |
+| `tree.js` → `details.js` / `graph.js` | `paint`、`card`；`mgPop`、`mgToggleBig`（Esc 处理） |
 
-反向那三个是 `tree.js` 对后加载文件的前向引用，**靠函数声明提升 + 运行时才求值**才成立。
+这些是导航对后加载文件的前向引用，**靠函数声明提升 + 运行时才求值**才成立。
 动 `paint()` 或 Esc 处理时留意别把它们打断。
 
 Esc 有三个去处，按「最贴身的先响应」排：**弹层 → 放大 → 清搜索**。
@@ -96,13 +123,13 @@ Esc 有三个去处，按「最贴身的先响应」排：**弹层 → 放大 �
 
 ## 关系模型
 
-八种关系，但**只有三族**——族才是图例上那四个开关的粒度：
+十种具体关系，按**三族**组织——族才是图例上那四个开关的粒度：
 
 | 族 | 关系 | 色 |
 |---|---|---|
-| `same` | 同一个东西 · 同一类的东西 · 可以互相替代 | 橙 |
+| `same` | 同一个东西 · 同一类的东西 · 可以互相替代（UI 表达为可比较，替代须另核条件） | 橙 |
 | `pair` | 固定搭配 | 青 |
-| `dep` | 底下用的是 · 被谁当底座 · 跑在……之上 · 跑在它之上的 | 蓝（带箭头） |
+| `dep` | 底下用的是 · 被谁当底座 · 跑在……之上 · 跑在它之上的 · 用什么语言实现 · 用于实现 | 蓝（带箭头） |
 | `tree` | 罩住（不在数据里，从 `p`/`c` 现推） | 灰 |
 
 两条要点：
@@ -150,11 +177,12 @@ Esc 有三个去处，按「最贴身的先响应」排：**弹层 → 放大 �
 
 ## 许可分两半
 
-代码（`src/` `build.mjs` `scripts/`）MIT；`data/concepts.json` 里那 1739 条中文释义是创作内容，
-CC BY-SA 4.0；图标来自 Lucide（ISC）。**加新内容时想清楚它属于哪一半。**
+代码（`src/`、`design/` 中的页面与脚本、`build.mjs`、`scripts/`）MIT；data/entries、旧数据与新样板中的原创解释、分类和关系说明为 CC BY-SA 4.0。第三方来源仍依其原有许可；Lucide 图标为 ISC。具体范围见 `LICENSE-CONTENT`。
 
 ## 另有一份落后的副本
 
 本机某个研究归档目录下的 `cs-concepts-tree.html` 是这个项目拆分前的单文件，
 停在早期版本（没有加减 / 组合 / 图标）。**它不是正本，不要往那边同步、也不要拿它当参考。**
 正本永远是这个仓库。
+
+[PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md

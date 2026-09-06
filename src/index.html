@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+<!--
+[INPUT]: 根构建注入样式、分类快照、逐节点解释来源、图标与交互代码。
+[OUTPUT]: 保留树与关联图的全景首页，详情与资料入口在独立侧栏展开。
+[POS]: 全景浏览器的结构正本；生成产物位于根 index.html。
+[PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+-->
 <html lang="zh-CN"><head><meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>计算机世界 · 概念 · 实体 · 关联</title>
@@ -7,7 +13,7 @@
 </style></head><body>
 <div id="top">
   <div id="title">计算机世界<span id="stat"></span></div>
-  <input id="q" placeholder="搜 jQuery、Redis、幂等、B+ 树…"/>
+  <input id="q" type="search" aria-label="搜索概念与项目" placeholder="搜 jQuery、Redis、幂等、B+ 树…"/>
   <div id="hits"></div>
   <button class="btn" data-a="groups">只看域</button>
   <button class="btn" data-a="concepts">展开到概念</button>
@@ -15,8 +21,8 @@
   <button class="btn" data-a="fit">适应屏幕</button>
   <button class="btn on" id="bgraph">关联模式</button>
 </div>
-<div id="stage" class="graph"><svg><g id="vp"><g id="garcs"></g><g id="glinks"></g><g id="gnodes"></g></g></svg></div>
-<div id="side">
+<main id="stage" class="graph" aria-label="可展开的知识地图"><svg><g id="vp"><g id="garcs"></g><g id="glinks"></g><g id="gnodes"></g></g></svg><div id="zoom-tools" aria-label="地图缩放"><button class="gb" id="zoom-in" aria-label="放大树图">＋</button><button class="gb" id="zoom-out" aria-label="缩小树图">−</button></div></main>
+<aside id="side" aria-label="节点解释与关联">
   <div id="mgp">
     <div id="mghead">
       <span class="gt">关联图谱</span><span id="mgc"></span>
@@ -37,27 +43,29 @@
       <div id="mgpop"></div>
     </div>
     <div id="mgfoot">
-      <span class="mgk on" data-k="same"><i style="border-color:#E8590C"></i>同类 · 可替代</span>
-      <span class="mgk on" data-k="pair"><i style="border-color:#2F7D74"></i>固定搭配</span>
-      <span class="mgk on" data-k="dep"><i style="border-color:#3B6FA0"></i>底座 · 之上</span>
-      <span class="mgk on" data-k="tree"><i style="border-color:#C7C2B8"></i>罩住</span>
-      <span class="mgnote">×N＝散在 N 处　·　⌥/Alt＋点＝摘掉</span>
+      <span class="mgk on" data-k="same"><i style="border-color:#E8590C"></i>同类 · 可比较</span>
+      <span class="mgk on" data-k="pair"><i style="border-color:#2F7D74"></i>常见配合</span>
+      <span class="mgk on" data-k="dep"><i style="border-color:#3B6FA0"></i>实现 · 运行依赖</span>
+      <span class="mgk on" data-k="tree"><i style="border-color:#C7C2B8"></i>包含</span>
+      <span class="mgnote">×N＝出现在 N 处　·　⌥/Alt＋点＝摘掉</span>
       <span id="mgmore"></span>
     </div>
   </div>
-  <div id="card"></div>
-</div>
+  <section id="card" tabindex="-1" aria-label="当前节点说明"></section>
+</aside>
 <div id="mgtip"></div>
 <div id="legend">
   <b>读法</b>　<span class="dot f"></span>实心＝里面还有　<span class="dot"></span>空心＝已展开或到底　
-  <span style="color:var(--or)">○</span> 橙圈＝这个节点有跨罩子的关联<br>
-  点圆点＝展开收起　·　点文字＝选中，右栏出详情与关联图谱<span class="dsh"></span>　·　拖动平移　·　滚轮缩放　·　Esc 清空
+  <span style="color:var(--or)">○</span> 橙圈＝这个节点有跨领域关联<br>
+  点圆点＝展开收起　·　点文字＝查看解释与资料<span class="dsh"></span>　·　拖动平移　·　滚轮缩放　·　Esc 先关弹层，再退出放大，再清搜索
 </div>
 <script>
 /*@inject data*/
+/*@inject content*/
 /*@inject bundles*/
 /*@inject icons.js*/
 /*@inject tree.js*/
+/*@inject details.js*/
 /*@inject graph.js*/
 /*@inject boot.js*/
 </script></body></html>

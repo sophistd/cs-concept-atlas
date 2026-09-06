@@ -1,9 +1,11 @@
 # 内容许可 · Content License
 
-本仓库里的**代码**（`src/`、`build.mjs`、`scripts/`）按根目录的 `LICENSE`，即 MIT。
+本仓库里的**代码**（`src/`、`design/` 中的页面模板、样式、交互与构建校验脚本，
+以及根目录 `build.mjs`、`scripts/`）按根目录的 `LICENSE`，即 MIT。
 
-本仓库里的**内容**——即 `data/concepts.json` 中那 1739 个节点的中文释义、
-分类判据、关系标注，以及由它们生成的 `dist/index.html` 里的对应文本——
+本仓库里的**原创内容**——即 `data/concepts.json`、`data/bundles.json`、`data/entries/*.json` 与
+`design/content.json` 中的中文释义、分类判据、关系标注，设计说明和贡献模板，
+以及由它们生成的根目录 `index.html`、`design/index.html` 里的对应文本——
 不是代码，是创作。它按下面这条：
 
     Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
@@ -13,14 +15,21 @@
 
 意思是：你可以拿去用、改、商用，但要**署名**，并且改完之后**得用同一个许可放出来**。
 
+链接和引用的第三方资料仍依其原有许可；本许可不重新授权那些网站、项目或商标。
+
 ---
 
 ## Summary in English
 
-Code in this repository (`src/`, `build.mjs`, `scripts/`) is MIT licensed — see `LICENSE`.
+Code in this repository (`src/`, the HTML/CSS/JavaScript templates and scripts in
+`design/`, root `build.mjs`, and `scripts/`) is MIT licensed — see `LICENSE`.
 
-The dataset in `data/concepts.json` — the 1739 nodes with their Chinese
-explanations, classification criteria and relation labels — is authored
-content, not code. It is licensed under
+Original explanations, classification criteria and relation labels in
+`data/concepts.json`, `data/bundles.json`, `data/entries/*.json` and `design/content.json`, the design
+notes and contribution templates, and their rendered text in root `index.html`
+and `design/index.html` are licensed under
 **Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)**.
 Full text: https://creativecommons.org/licenses/by-sa/4.0/legalcode
+
+Third-party sources and projects retain their original licenses. This license
+does not relicense linked websites, projects or trademarks.

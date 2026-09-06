@@ -1,4 +1,10 @@
 #!/usr/bin/env node
+/**
+ * [INPUT]: 已安装的 lucide-react 图标源与本文件的领域映射。
+ * [OUTPUT]: 生成 src/icons.js 的内联几何和来源许可头部。
+ * [POS]: 图标维护入口，日常构建直接使用已生成文件，不重复提取。
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
 // 从本地装着的 lucide-react 里抠出这 24 个图标的几何数据，生成 src/icons.js。
 // 不引 CDN、不引 npm 依赖 —— 产物要能离线双击打开，所以图标必须内联进去。
 // lucide 是 ISC 许可，署名写在生成文件的头部与 README 里。
@@ -78,7 +84,13 @@ const body = Object.entries(out)
   .map(([k, v]) => ` ${JSON.stringify(k)}: ${JSON.stringify(v)}`)
   .join(',\n');
 
-writeFileSync(join(root, 'src/icons.js'), `// 由 scripts/extract-icons.mjs 生成，别手改 —— 换图标改那个脚本的 MAP。
+writeFileSync(join(root, 'src/icons.js'), `/**
+ * [INPUT]: extract-icons.mjs 选取的 Lucide 图标几何数据。
+ * [OUTPUT]: ICON 常量，为 24 个领域提供内联 SVG 几何。
+ * [POS]: 全景图标资源，被 graph 的 mgPaint 消费，不引入外部运行时请求。
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
+// 由 scripts/extract-icons.mjs 生成，别手改 —— 换图标改那个脚本的 MAP。
 //
 // 图标来自 Lucide (https://lucide.dev)，ISC 许可，版本 ${version}。
 // 每个值是 [标签名, 几何属性] 的数组，画在 24×24 的坐标系里，

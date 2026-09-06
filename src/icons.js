@@ -1,3 +1,9 @@
+/**
+ * [INPUT]: extract-icons.mjs 选取的 Lucide 图标几何数据。
+ * [OUTPUT]: ICON 常量，为 24 个领域提供内联 SVG 几何。
+ * [POS]: 全景图标资源，被 graph 的 mgPaint 消费，不引入外部运行时请求。
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
 // 由 scripts/extract-icons.mjs 生成，别手改 —— 换图标改那个脚本的 MAP。
 //
 // 图标来自 Lucide (https://lucide.dev)，ISC 许可，版本 1.23.0。

@@ -1,8 +1,14 @@
+/**
+ * [INPUT]: 依赖树视图的节点、选中导航与绘制工具，消费组合和内联图标数据。
+ * [OUTPUT]: 提供 mgShow、mgToggleBig 与 mgPop，协调关联图布局、导航、弹层及平移缩放。
+ * [POS]: src 的关联视图，与 tree.js 共享选中对象；弹层自己消费输入，避免污染图谱状态。
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
 // ── 右栏 · 关联图谱 ────────────────────────────────────────────
 // 树只画得出「罩住」这一层，跨罩子的关联在树里是断的。这块面板把它接上：
 // 以选中的节点为圆心，按跳数往外铺最多三圈，圈与圈之间的线就是关系本身。
 // 一跳 = 一条关系。三跳 = 关系的关系的关系，再远就没有可读性了。
-// 八种关系压成三族。族是图例上那四个开关的粒度 —— 一键关掉一整族，
+// 关系按相似、配合和依赖三族组织，具体标签仍区分实现语言与运行环境。
 // 是从「一团乱麻」里捞回可读性最省力的办法。
 const MREL={
  '同一个东西'  :{f:'same',c:'#E8590C',d:'',      w:2,  a:0},
@@ -12,8 +18,10 @@ const MREL={
  '底下用的是'  :{f:'dep', c:'#3B6FA0',d:'',      w:1.4,a:1},
  '被谁当底座'  :{f:'dep', c:'#3B6FA0',d:'',      w:1.4,a:2},
  '跑在……之上' :{f:'dep', c:'#3B6FA0',d:'',      w:1.4,a:1},
- '跑在它之上的':{f:'dep', c:'#3B6FA0',d:'',      w:1.4,a:2}};
-const MINV={'被谁当底座':'底下用的是','跑在它之上的':'跑在……之上'};
+ '跑在它之上的':{f:'dep', c:'#3B6FA0',d:'',      w:1.4,a:2},
+ '用什么语言实现':{f:'dep',c:'#3B6FA0',d:'',     w:1.4,a:1},
+ '用于实现'    :{f:'dep', c:'#3B6FA0',d:'',      w:1.4,a:2}};
+const MINV={'被谁当底座':'底下用的是','跑在它之上的':'跑在……之上','用于实现':'用什么语言实现'};
 const MTRE={f:'tree',c:'#C7C2B8',d:'',w:.9,a:0};
 
 // 同一个东西常常同时挂在好几个概念下 —— 树里它们是几个不同的点，图谱里得是一个。
@@ -305,11 +313,11 @@ mgNg.addEventListener('mouseover',e=>{ const g=e.target.closest('.mgn'); if(!g) 
   mgFocus(i);
   const rel=(MNBR.get(i)||new Set()).size;
   const where = fam.length>1
-    ? '散在 '+fam.length+' 处：<br>'+fam.slice(0,5).map(m=>esc(crumb(N[m])||'根')).join('<br>')
+    ? '出现在 '+fam.length+' 处：<br>'+fam.slice(0,5).map(m=>esc(crumb(N[m])||'根')).join('<br>')
       +(fam.length>5?'<br>…':'')
     : esc(crumb(n)||'根');
   mgTip.innerHTML='<b>'+esc(mgName(i))+'</b>'+(n.e?' '+esc(n.e):'')
-    +'<br>'+where+'<br>'+(rel?rel+' 个关联对象':'无跨罩子关联')
+    +'<br>'+where+'<br>'+(rel?rel+' 个关联对象':'尚无跨领域关联')
     +'<br><span style="color:#9A958C">点＝换中心　·　⌥点＝摘掉</span>';
   mgTip.style.opacity=1; });
 mgNg.addEventListener('mouseout',e=>{ if(e.target.closest('.mgn')){ mgBlur(); mgTip.style.opacity=0; } });
@@ -348,17 +356,25 @@ document.getElementById('mgbig').addEventListener('click',mgToggleBig);
 mgMore.addEventListener('click',()=>{ if(mgMore.dataset.on) mgToggleBig(); });
 
 // 面板自己的平移缩放，跟主画布互不干扰
-let mgDrag=false, mgSx=0, mgSy=0;
-mgWrap.addEventListener('mousedown',e=>{ mgDrag=true; mgWrap.classList.add('drag');
+let mgDrag=false, mgSx=0, mgSy=0, mgPointer=null;
+mgWrap.addEventListener('pointerdown',e=>{
+  if(e.button!==0 || mgDrag || e.target.closest('#mgpop') || e.target.closest('.mgn')) return;
+  mgDrag=true; mgPointer=e.pointerId; mgWrap.classList.add('drag');
+  mgWrap.setPointerCapture(e.pointerId);
   mgSx=e.clientX-mgTx; mgSy=e.clientY-mgTy; e.stopPropagation(); });
-window.addEventListener('mousemove',e=>{ if(!mgDrag) return;
+window.addEventListener('pointermove',e=>{ if(!mgDrag || e.pointerId!==mgPointer) return;
   mgTx=e.clientX-mgSx; mgTy=e.clientY-mgSy; mgApply(); });
-window.addEventListener('mouseup',()=>{ mgDrag=false; mgWrap.classList.remove('drag'); });
-mgWrap.addEventListener('wheel',e=>{ e.preventDefault();
+function mgEndDrag(e){ if(e.pointerId!==mgPointer) return;
+  mgDrag=false; mgPointer=null; mgWrap.classList.remove('drag'); }
+window.addEventListener('pointerup',mgEndDrag);
+window.addEventListener('pointercancel',mgEndDrag);
+mgWrap.addEventListener('lostpointercapture',mgEndDrag);
+mgWrap.addEventListener('wheel',e=>{ if(e.target.closest('#mgpop')) return; e.preventDefault();
   const r=mgWrap.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top;
   const nk=Math.min(3,Math.max(.08, mgK*(e.deltaY<0?1.12:1/1.12)));
   mgTx=mx-(mx-mgTx)*(nk/mgK); mgTy=my-(my-mgTy)*(nk/mgK); mgK=nk; mgApply(); },{passive:false});
-mgWrap.addEventListener('dblclick',()=>{ mgLive.clear(); mgShow(N[mgSel]); });
+mgWrap.addEventListener('dblclick',e=>{ if(e.target.closest('#mgpop')) return;
+  mgLive.clear(); mgShow(N[mgSel]); });
 addEventListener('resize',()=>{ if(mgPos) mgFit(mgPos); });
 
 
@@ -407,7 +423,8 @@ function mgPaintBar(){
 }
 
 // ── 弹层：加点 与 选组合 共用一个 ───────────────────────────────
-function mgClosePop(){ mgPop.style.display='none'; mgPop.innerHTML='';
+function mgClosePop(){ mgPop.style.display='none'; mgPop.innerHTML=''; mgPop.onclick=null;
+  delete mgPop.dataset.kind;
   document.getElementById('mgadd').classList.remove('on');
   if(mgBundle==null) document.getElementById('mgbun').classList.remove('on'); }
 function mgOpenPop(html){ mgPop.innerHTML=html; mgPop.style.display='block'; }
@@ -433,11 +450,12 @@ document.getElementById('mgadd').addEventListener('click',function(){
           +'<span class="p">'+esc(crumb(N[r])||'根')+'</span></div>').join('')
       : '<div class="mgh">没有这个</div>';
   };
-  const add=i=>{ mgHide.delete(i); mgPin.add(i); mgClosePop(); mgLive.clear(); mgShow(N[mgSel]); };
+  const add=i=>{ if(!Number.isInteger(i) || !N[i]) return;
+    mgHide.delete(i); mgPin.add(i); mgClosePop(); mgLive.clear(); mgShow(N[mgSel]); };
   q.addEventListener('input',draw);
   q.addEventListener('keydown',e=>{ if(e.key==='Enter'){ const f=res.querySelector('.mgr'); if(f) add(+f.dataset.i); }
-    else if(e.key==='Escape'){ mgClosePop(); } });
-  res.addEventListener('click',e=>{ const r=e.target.closest('.mgr'); if(r) add(+r.dataset.i); });
+    else if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); mgClosePop(); } });
+  res.addEventListener('click',e=>{ const r=e.target.closest('.mgr[data-i]'); if(r) add(+r.dataset.i); });
   draw(); q.focus();
 });
 
@@ -450,8 +468,10 @@ document.getElementById('mgbun').addEventListener('click',function(){
     + BUNDLES.map((b,k)=>'<div class="mgr'+(k===mgBundle?' on':'')+'" data-b="'+k+'"><b>'+esc(b.name)
         +'</b><span class="x">'+b.members.length+' 个</span>'
         +'<span class="p">'+esc(b.note)+'</span></div>').join(''));
-  mgPop.onclick=e=>{ const r=e.target.closest('.mgr'); if(!r) return;
+  mgPop.onclick=e=>{ if(mgPop.dataset.kind!=='bun') return;
+    const r=e.target.closest('.mgr[data-b]'); if(!r) return;
     const k=+r.dataset.b;
+    if(!/^-?\d+$/.test(r.dataset.b) || !Number.isInteger(k) || k < -1 || k >= BUNDLES.length) return;
     mgBundle = k<0 ? null : k;
     document.getElementById('mgbun').classList.toggle('on', mgBundle!=null);
     mgClosePop(); mgLive.clear();
@@ -460,4 +480,5 @@ document.getElementById('mgbun').addEventListener('click',function(){
       if(!BUNDLES[mgBundle].members.some(m=>mrep(m.i)===mrep(mgSel))) goto(first); else mgShow(N[mgSel]); }
     else mgShow(N[mgSel]); };
 });
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') mgClosePop(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape' && mgPop.style.display==='block'){
+  e.preventDefault(); mgClosePop(); } });

@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
+# [INPUT]: 读取 drafts/*.md 三段草稿与 data/concepts.json 的正文及审核状态。
+# [OUTPUT]: 校验后合并正文；首次或变更正文标草稿，未变正文保留审核结果，--approve 明确认可。
+# [POS]: scripts 的历史释义维护入口，不覆盖 data/entries 的当前页面正文；--check 只读。
+# [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
 """把 drafts/*.md 里的三行草稿合进 data/concepts.json 的 m 字段。
 
-正本是那份 md，不是 JSON —— 释义要被人反复改，改在 337KB 的 JSON 里没法看。
-所以流程是：改 md → 跑这个脚本 → node build.mjs。
+本工具只维护旧库的 m 与 draft。当前首页正文维护在 data/entries，
+旧稿修订需由维护者核查后整理进对应条目，不能靠本脚本覆盖新正文。
 
 格式（严格）：
     ### #<下标> <概念名> · <域名>
@@ -10,10 +14,10 @@
     机制：…
     判断：…
 
-三行合成一段存进 m。带 draft 标记的节点在界面上显示「草稿」角标 ——
-认可一条就把它从 drafts/APPROVED 里…… 见下面 --approve。
+三行合成一段存进旧库 m，draft 仅保存这份历史正文的审核状态。
+未变正文保留先前审核结果；首次或变更的正文重新标草稿，--approve 可确认本次正文。
 
-    python3 scripts/merge-drafts.py              # 合并，全部标 draft
+    python3 scripts/merge-drafts.py              # 合并，保留未变正文的审核结果
     python3 scripts/merge-drafts.py --approve 53 209   # 顺带把这几条的 draft 摘掉
     python3 scripts/merge-drafts.py --check      # 只校验不写
 """
@@ -76,13 +80,14 @@ if check:
 changed = 0
 for idx, name, _, text in blocks:
     n = N[idx]
-    if n.get("m") != text: changed += 1
+    text_changed = n.get("m") != text
+    if text_changed: changed += 1
     n["m"] = text
     if idx in approve: n.pop("draft", None)
-    else: n["draft"] = True
+    elif text_changed: n["draft"] = True
 
 DATA.write_text(json.dumps(doc, ensure_ascii=False, indent=1), "utf-8")
 drafts = sum(1 for n in N if n.get("draft"))
 print(f"合并 {len(blocks)} 条（内容有变的 {changed} 条）→ data/concepts.json")
 print(f"仍标为草稿的：{drafts} 条" + (f"　·　本次通过：{sorted(approve)}" if approve else ""))
-print("接着跑：node build.mjs")
+print("当前首页正文来自 data/entries；旧稿修订需核查后整理到对应条目。")

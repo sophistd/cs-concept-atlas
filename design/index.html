@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<!--
+[INPUT]: 本目录样式、view.js、核实内容与原型的域名称，由 build.mjs 内联。
+[OUTPUT]: 三入口导航样板与可访问的首页结构，不加载外部运行时资源。
+[POS]: 设计样板的语义骨架；资源正文由共享内容库渲染。
+[PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>计算机世界 · 导航设计样板</title>
+  <style>
+/*
+ * [INPUT]: template.html 与 view.js 的语义区域、选中状态和资源卡结构。
+ * [OUTPUT]: 暖灰与橙色的导航样板视觉、响应式布局、可见焦点和打印样式。
+ * [POS]: design 的展示层；不通过固定侧栏覆盖主内容，保留自然纵向滚动。
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
+:root{--paper:#F6F4F0;--panel:#EEECE8;--ink:#22211F;--muted:#65615A;--line:#D8D5CF;--orange:#AF3E08;--tint:#FCEDE1;--white:#FFFDF9;--font:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
+*{box-sizing:border-box}html{scroll-behavior:auto}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.7 var(--font)}
+button,a,input{touch-action:manipulation}a{color:inherit;text-underline-offset:4px}button{font:inherit;color:inherit;cursor:pointer}button,a{-webkit-tap-highlight-color:transparent}
+button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--orange);outline-offset:4px}button{border:0;background:none}h1,h2,h3,p{margin:0}h1,h2,h3{line-height:1.4;text-wrap:pretty}h1{font-size:34px;letter-spacing:-1px;font-weight:650}h2{font-size:20px}h3{font-size:17px}p{overflow-wrap:anywhere}small{font-size:12px}svg{display:block}
+[hidden]{display:none!important}.skip{position:absolute;left:20px;top:-100px;z-index:10;background:var(--ink);color:white;padding:12px}.skip:focus{top:12px}
+.masthead{max-width:1440px;margin:auto;min-height:78px;padding:16px 38px;display:flex;align-items:center;gap:16px}.wordmark{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:700;text-decoration:none;white-space:nowrap}.mark{color:var(--orange);font:26px/1 monospace}.wordmark-en{font-size:10px;color:var(--muted);font-weight:500;letter-spacing:1.4px;margin-left:6px}.edition{font-size:11px;color:var(--muted);padding:2px 8px;border:1px solid var(--line);border-radius:4px}.legacy{margin-left:auto;display:flex;align-items:center;min-height:44px;font-size:12px;color:var(--muted);text-decoration:none}.legacy:hover{color:var(--orange)}
+.entry-nav{display:flex;gap:30px;padding:0 38px;max-width:1440px;margin:auto;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.entry-nav a{min-height:55px;display:flex;align-items:center;gap:10px;text-decoration:none;border-bottom:3px solid transparent;margin-bottom:-1px;font-size:14px;color:var(--muted)}.entry-nav span{font-size:11px;font-variant-numeric:tabular-nums;color:var(--muted)}.entry-nav a[aria-current]{border-color:var(--orange);color:var(--orange);font-weight:600}
+main{max-width:1364px;margin:auto;padding:32px 38px 44px;outline:none;min-height:65vh}.page-heading{margin-bottom:26px}.eyebrow{font-size:11px;letter-spacing:1.1px;color:var(--orange);margin-bottom:8px}.intro{color:var(--muted);margin-top:10px;max-width:740px;font-size:14px}.home-layout{display:grid;grid-template-columns:minmax(0,1fr) 292px;gap:24px;align-items:stretch}.composition{min-width:0;border:1px solid var(--line);border-radius:8px;background:var(--white);padding:19px 20px 14px}.section-label{display:flex;gap:12px;justify-content:space-between;align-items:center}.section-label h2{font-size:14px}.section-label span{font-size:11px;color:var(--muted)}
+.software-map{position:relative;height:360px;margin:4px -5px 0}.connections{position:absolute;inset:0;width:100%;height:100%;color:#A6A095;pointer-events:none}.connection{fill:none;stroke:currentColor;stroke-width:1.4;marker-start:url(#arrow);marker-end:url(#arrow)}.part{position:absolute;text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:12px 11px;min-height:90px;width:24%}.part:hover{border-color:var(--orange)}.part strong{font-size:15px;display:block;line-height:1.4;margin:5px 0}.part small{display:block;color:var(--muted);font-size:11px;line-height:1.5}.part-no{font-size:10px;color:var(--muted);display:flex;align-items:center;justify-content:space-between;gap:5px;font-variant-numeric:tabular-nums}.sample-dot{font-size:9px;color:var(--orange)}.part-interface{left:1.5%;top:19%}.part-logic{left:37%;top:19%}.part-storage{right:1.5%;top:19%}.part-network{left:37%;top:58%;width:28%}.part.selected,.workshop-tools button.selected{border-color:var(--orange);background:var(--tint)}.part.selected strong{color:var(--orange)}.edge-label{position:absolute;top:10%;font-size:10px;color:var(--muted)}.edge-ui{left:24%}.edge-data{left:61%}.runtime{position:absolute;bottom:0;left:1.5%;right:1.5%;min-height:48px;display:flex;align-items:center;gap:12px;background:var(--panel);padding:10px 12px;text-align:left;border:1px solid transparent;border-radius:4px}.runtime:hover,.runtime.selected{border-color:var(--orange)}.runtime strong{font-size:12px;white-space:nowrap}.runtime span{font-size:10px;color:var(--muted);flex:1}.runtime b{font-size:14px;font-weight:400;color:var(--orange)}.map-note{font-size:11px;color:var(--muted);margin-top:17px;padding-top:13px;border-top:1px solid var(--line)}
+.role-inspector{display:flex;flex-direction:column;background:var(--panel);border-radius:8px;padding:25px 22px;min-width:0}.role-inspector h2{font-size:22px;margin:4px 0 15px}.role-inspector p{font-size:13px;color:var(--muted)}.role-inspector .role-example{font-size:14px;color:var(--ink);margin:16px 0;padding-top:16px;border-top:1px solid var(--line)}.role-inspector .status{margin-bottom:11px;align-self:flex-start}.role-inspector .action{margin-top:auto}.role-inspector .incomplete{margin-top:auto;padding-top:18px;font-size:12px}
+.status{display:inline-block;font-size:10px;padding:2px 7px;border:1px solid var(--line);border-radius:4px;color:var(--muted);font-weight:400;white-space:nowrap}.status.ready{color:var(--orange);background:var(--tint);border-color:#E2B99D}.action{display:inline-flex;align-items:center;justify-content:space-between;gap:15px;min-height:46px;padding:10px 15px;border:1px solid var(--orange);border-radius:5px;background:var(--orange);color:#fff;text-decoration:none;font-size:13px;font-weight:500}.action.secondary{background:transparent;color:var(--orange)}.action:hover{filter:brightness(.93)}
+.workshop{margin-top:25px;padding:22px 0 2px;border-top:1px solid var(--line);display:grid;grid-template-columns:250px 1fr;gap:25px}.workshop-heading h2{font-size:17px}.workshop-heading p:last-child{font-size:12px;color:var(--muted);margin-top:7px}.workshop-tools{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0}.workshop-tools button{text-align:left;padding:6px 13px;border:1px solid transparent;border-left:1px solid var(--line);min-height:98px}.workshop-tools button:hover{background:var(--panel)}.workshop-tools button span{font-size:10px;color:var(--muted);display:block}.workshop-tools strong{font-size:13px;display:block;margin:5px 0}.workshop-tools small{font-size:11px;color:var(--muted);display:block}
+.site-foot{border-top:1px solid var(--line);max-width:1288px;margin:0 auto;padding:18px 0 26px;display:flex;align-items:flex-start;gap:20px;color:var(--muted);font-size:11px}.site-foot p{flex:1}.site-foot div{display:flex;gap:18px}.site-foot a{display:inline-flex;align-items:center;min-height:28px}
+.overview-layout{display:grid;grid-template-columns:minmax(0,1fr) 292px;gap:26px}.domain-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:22px;align-content:start}.domain-row{display:flex;min-height:66px;align-items:center;gap:10px;text-decoration:none;text-align:left;border-bottom:1px solid var(--line);padding:10px 0}.domain-row .ordinal{font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums}.domain-row strong{font-size:13px;line-height:1.5;font-weight:500;flex:1}.domain-row .status{font-size:9px;padding:1px 4px}.domain-row:hover,.domain-row.selected{color:var(--orange)}.domain-row.featured{border-bottom-color:var(--orange)}.overview-note{margin-top:20px;font-size:12px;color:var(--muted)}
+.product-list{display:flex;flex-direction:column;gap:0}.product-row{display:grid;grid-template-columns:35px 1fr auto;align-items:center;text-align:left;text-decoration:none;gap:15px;min-height:94px;border-bottom:1px solid var(--line);padding:14px 8px}.product-row .ordinal{font-size:12px;color:var(--muted)}.product-row strong{display:block;font-size:16px;font-weight:600}.product-row small{color:var(--muted);display:block;margin-top:4px;font-size:12px}.product-row:hover,.product-row.selected{background:var(--panel)}.product-row .go{color:var(--orange);font-size:20px}.product-row.featured{background:var(--tint);border:1px solid #E2B99D;border-radius:7px;padding:20px 16px;margin-bottom:9px}
+.breadcrumbs{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-bottom:22px}.breadcrumbs a{min-height:28px;display:inline-flex;align-items:center}.breadcrumbs b{font-weight:400;color:var(--orange)}.topic-layout{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:36px}.topic-intro{max-width:680px}.topic-intro h1{margin-bottom:12px}.topic-intro>p{font-size:15px;color:var(--muted)}.explain-grid{display:grid;grid-template-columns:1fr 1fr;gap:25px;margin-top:27px;padding-top:22px;border-top:1px solid var(--line)}.explain-grid h2{font-size:13px;margin-bottom:7px}.explain-grid p{font-size:13px;color:var(--muted)}.resource-list{margin-top:28px}.resource-list h2{font-size:15px;margin-bottom:12px}.resource-option{display:grid;grid-template-columns:1fr auto;gap:12px;border-top:1px solid var(--line);padding:19px 0;text-decoration:none}.resource-option strong{font-size:22px;font-family:var(--font);font-weight:600}.resource-option small{color:var(--muted);display:block;font-size:12px;margin:3px 0}.resource-option p{font-size:13px;max-width:590px;margin-top:6px}.resource-option .go{align-self:center;font-size:22px;color:var(--orange)}.resource-option:hover strong{color:var(--orange)}.topic-aside{background:var(--panel);padding:22px;border-radius:8px;align-self:start}.topic-aside h2{font-size:17px;margin-bottom:12px}.topic-aside p{font-size:12px;color:var(--muted)}.topic-aside .decision-row{margin-top:17px;padding-top:15px;border-top:1px solid var(--line)}.topic-aside strong{font-size:13px;display:block;margin-bottom:5px}.topic-aside a{font-size:12px;display:inline-flex;align-items:center;min-height:38px;color:var(--orange)}
+.shared-routes{margin-top:35px;border-top:1px solid var(--line);padding-top:20px}.shared-routes h2{font-size:15px}.shared-routes>p{font-size:12px;color:var(--muted);margin-top:6px}.route-diagram{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:17px}.route-branch{font-size:12px;text-decoration:none;border:1px solid var(--line);border-radius:5px;padding:13px 15px;position:relative}.route-branch strong{display:block;font-size:13px;margin-bottom:5px}.route-branch span{color:var(--muted)}.route-branch[aria-current]{border-color:var(--orange);background:var(--tint)}.route-branch:hover{border-color:var(--orange)}.converge{text-align:center;font-size:12px;color:var(--orange);padding-top:12px}.converge span{display:inline-block;border-top:1px solid #CDA68D;padding:9px 25px}
+.resource-layout{display:grid;grid-template-columns:minmax(0,1fr) 315px;gap:38px}.resource-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}.resource-head h1{font-size:40px;letter-spacing:-.7px}.resource-head .kind{font-size:12px;color:var(--muted);margin-top:5px}.resource-summary{font-size:17px;margin-top:18px;max-width:720px}.resource-section{border-top:1px solid var(--line);padding-top:19px;margin-top:23px}.resource-section h2{font-size:14px;margin-bottom:9px}.resource-section p,.resource-section li{font-size:13px;color:var(--muted)}.resource-section ul{padding-left:18px;margin:7px 0 0}.resource-section li+li{margin-top:6px}.resource-aside{background:var(--panel);border-radius:8px;padding:23px;align-self:start}.resource-aside .action{width:100%;margin:6px 0 12px}.resource-aside>p{font-size:11px;color:var(--muted)}.resource-aside h2{font-size:14px;margin:22px 0 8px}.sources-list{padding:0;margin:0;list-style:none}.sources-list li{margin-bottom:7px}.sources-list a{font-size:12px;display:inline-block;padding:4px 0;overflow-wrap:anywhere}.source-date{font-size:10px;color:var(--muted);margin-top:12px}.concept-note{margin-top:9px;border:1px solid var(--line);border-radius:5px;background:var(--white)}.concept-note summary{padding:12px 14px;font-size:13px;cursor:pointer;min-height:46px}.concept-note p{padding:0 14px 12px;font-size:12px;color:var(--muted)}.concept-note p strong{color:var(--ink);font-weight:500}.comparison{padding:17px;border:1px solid #D9BCA9;border-radius:5px;margin-top:20px}.comparison summary{min-height:44px;cursor:pointer;padding:8px 0}.comparison p{font-size:12px;color:var(--muted);margin:8px 0}.comparison a{font-size:13px;color:var(--orange);display:inline-flex;align-items:center;min-height:36px}.not-found{padding:65px 0;max-width:600px}.not-found p{margin:15px 0 25px;color:var(--muted)}.noscript{padding:30px}
+@media(min-width:1440px){.software-map{height:360px}.role-inspector{padding:29px 25px}.role-inspector h2{font-size:24px}}
+@media(max-width:1100px){main{padding:27px 25px 35px}.masthead{padding:14px 25px}.entry-nav{padding:0 25px}.home-layout,.overview-layout{grid-template-columns:minmax(0,1fr) 260px;gap:18px}.composition{padding:16px 12px 12px}.part strong{font-size:13px}.part small{font-size:10px}.part{padding:9px 8px}.software-map{height:360px}.part-network{width:30%}.workshop{grid-template-columns:200px 1fr;gap:15px}.workshop-tools button{padding:6px 9px}.domain-list{grid-template-columns:repeat(2,minmax(0,1fr))}.site-foot{margin:0 25px}}
+@media(max-width:800px){.wordmark-en{display:none}.masthead{padding:12px 20px;min-height:68px;gap:10px}.wordmark{font-size:18px}.edition{font-size:10px}.legacy{font-size:11px}.entry-nav{padding:0 20px;gap:23px}.entry-nav a{font-size:13px;gap:7px;min-height:51px}.entry-nav span{font-size:10px}main{padding:26px 20px 32px}h1{font-size:29px}.home-layout,.overview-layout,.topic-layout,.resource-layout{grid-template-columns:1fr;gap:22px}.role-inspector{padding:20px;min-height:240px}.role-inspector .action{margin-top:17px;align-self:flex-start}.role-inspector h2{font-size:21px;margin:0 0 9px}.role-inspector .role-example{margin:12px 0}.software-map{height:360px}.part strong{font-size:15px}.part small{font-size:11px}.part{padding:11px}.runtime span{font-size:11px}.workshop{grid-template-columns:1fr;gap:15px}.workshop-tools{grid-template-columns:repeat(4,minmax(0,1fr))}.site-foot{margin:0 20px;flex-direction:column;gap:5px}.domain-list{grid-template-columns:repeat(3,minmax(0,1fr))}.topic-aside{padding:20px}.resource-aside{display:grid;grid-template-columns:1fr;max-width:none}.route-diagram{gap:10px}.route-branch{padding:12px 10px}.resource-head h1{font-size:34px}}
+@media(max-width:560px){.masthead{padding:12px 16px;flex-wrap:wrap;gap:8px}.wordmark{font-size:17px}.mark{font-size:23px}.edition{margin-left:auto}.legacy{display:none}.entry-nav{padding:0 16px;gap:0;justify-content:space-between}.entry-nav a{font-size:12px;min-height:52px;gap:5px}.entry-nav span{display:none}main{padding:23px 16px 30px}.page-heading{margin-bottom:19px}h1{font-size:27px}.intro{font-size:13px;margin-top:9px}.section-label{align-items:flex-start;gap:8px}.section-label span{font-size:10px}.software-map{height:auto;min-height:0;margin:14px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:12px}.connections,.edge-label{display:none}.part,.part-interface,.part-logic,.part-storage,.part-network{position:static;width:auto;min-height:112px;padding:12px}.part-storage{grid-column:1/-1}.part-storage strong{font-size:18px}.part-network{grid-column:1/-1;min-height:95px}.part strong{font-size:15px}.part small{font-size:11px}.part-no{font-size:10px}.sample-dot{font-size:10px}.runtime{position:static;grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;min-height:78px}.runtime span{flex-basis:100%;order:3}.runtime b{margin-left:auto}.map-note{font-size:11px;line-height:1.75}.role-inspector{min-height:0}.workshop{margin-top:22px;padding-top:20px}.workshop-tools{grid-template-columns:1fr 1fr;gap:12px}.workshop-tools button{padding:10px;min-height:115px}.workshop-tools button strong{font-size:13px}.workshop-tools small{font-size:12px}.domain-list{grid-template-columns:1fr 1fr;column-gap:15px}.domain-row{display:grid;grid-template-columns:18px minmax(0,1fr);min-height:78px;gap:3px 7px}.domain-row strong{font-size:12px}.domain-row .status{grid-column:2;justify-self:start;margin-left:0}.product-row{grid-template-columns:23px 1fr auto;gap:10px;padding:15px 0}.product-row.featured{padding:16px 10px}.product-row strong{font-size:14px}.product-row small{font-size:11px}.explain-grid{grid-template-columns:1fr;gap:20px}.topic-intro>p{font-size:14px}.breadcrumbs{font-size:11px;gap:5px;margin-bottom:16px}.resource-head{flex-wrap:wrap;gap:10px}.resource-head h1{font-size:32px}.resource-summary{font-size:16px}.resource-option strong{font-size:21px}.route-diagram{grid-template-columns:1fr;gap:9px}.route-branch{display:grid;grid-template-columns:140px 1fr;align-items:center;min-height:62px;gap:9px;padding:10px 13px}.route-branch strong{font-size:12px;margin:0}.route-branch span{font-size:11px}.site-foot{margin:0 16px;font-size:10px}.site-foot div{flex-wrap:wrap;gap:8px 18px}.site-foot a{min-height:44px}.source-date{font-size:11px}.sources-list a{min-height:44px;display:flex;align-items:center}.resource-aside{padding:20px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+@media print{.masthead,.entry-nav,.site-foot,.skip{display:none}body{background:#fff;font-size:12pt}main{padding:0}.home-layout,.topic-layout,.resource-layout,.overview-layout{display:block}.role-inspector,.topic-aside,.resource-aside{margin-top:22px}.software-map{break-inside:avoid}.workshop{display:block}.resource-section,.route-diagram,.resource-option{break-inside:avoid}a{color:#222}.concept-note p{display:block}}
+</style>
+</head>
+<body>
+  <a class="skip" href="#main">跳到主要内容</a>
+  <header class="masthead">
+    <a class="wordmark" href="#home"><span class="mark" aria-hidden="true">[·]</span>计算机世界<span class="wordmark-en">CS / SE ATLAS</span></a>
+    <span class="edition">首轮设计样板</span>
+    <a class="legacy" href="../index.html">原有全景原型 ↗</a>
+  </header>
+  <nav class="entry-nav" aria-label="地图入口">
+    <a href="#home" data-entry="home"><span>01</span>软件由什么组成</a>
+    <a href="#domains" data-entry="domains"><span>02</span>全域地图</a>
+    <a href="#products" data-entry="products"><span>03</span>按产品探索</a>
+  </nav>
+  <main id="main" tabindex="-1"></main>
+  <footer class="site-foot">
+    <p>全景仍在整理。本轮完整展开「保存和查找信息」，来源核对不等于完成读者验证。</p>
+    <div><a href="review.md">设计说明</a><a href="sources.md">来源记录</a><a href="../CONTRIBUTING.md">一起完善这张地图 ↗</a></div>
+  </footer>
+  <template id="home-template">
+    <section class="page-heading">
+      <p class="eyebrow">从你做出来的软件开始</p>
+      <h1>先看懂，它由什么组成。</h1>
+      <p class="intro">从一个部件出发，认识它的分工，再找到具体的框架、工具与资料。</p>
+    </section>
+    <div class="home-layout">
+      <section class="composition" aria-labelledby="composition-title">
+        <div class="section-label"><h2 id="composition-title">运行中的软件</h2><span>点部件，看看它负责什么</span></div>
+        <div class="software-map">
+          <svg class="connections" viewBox="0 0 760 360" preserveAspectRatio="none" aria-hidden="true">
+            <defs><marker id="arrow" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M1 1L6 4L1 7" fill="none" stroke="currentColor"/></marker></defs>
+            <path class="connection" d="M198 115H277"/>
+            <path class="connection" d="M468 115H562"/>
+            <path class="connection" d="M375 163V205"/>
+          </svg>
+          <span class="edge-label edge-ui">操作 / 响应</span><span class="edge-label edge-data">写入 / 查询</span>
+          <button class="part part-interface" data-role="interface"><span class="part-no">01</span><strong>界面与入口</strong><small>人怎样使用它</small></button>
+          <button class="part part-logic" data-role="logic"><span class="part-no">02</span><strong>程序逻辑</strong><small>收到操作后做什么</small></button>
+          <button class="part part-storage selected" data-role="storage" aria-pressed="true"><span class="part-no">03 <span class="sample-dot">本轮样板</span></span><strong>保存和查找信息</strong><small>信息放在哪，怎样取回来</small></button>
+          <button class="part part-network" data-role="network"><span class="part-no">04</span><strong>与其他系统协作</strong><small>通过接口交换信息</small></button>
+          <button class="runtime" data-role="runtime"><strong>05　运行环境</strong><span>操作系统、运行时、托管平台，为需要的部件提供支持</span><b aria-hidden="true">↗</b></button>
+        </div>
+        <p class="map-note">这是一种常见的组织方式。脚本、本地应用、网页应用，会用到不同的部件。</p>
+      </section>
+      <aside id="role-inspector" class="role-inspector" aria-live="polite"></aside>
+    </div>
+    <section class="workshop" aria-labelledby="workshop-title">
+      <div class="workshop-heading"><p class="eyebrow">制作过程中的工具</p><h2 id="workshop-title">它们帮助你把软件做出来。</h2><p>与上面的运行部件分开看。</p></div>
+      <div class="workshop-tools">
+        <button data-role="agent"><span>表达与实现</span><strong>人与 Coding Agent</strong><small>说明目标，生成并修改代码</small></button>
+        <button data-role="editor"><span>编辑与调试</span><strong>开发工具</strong><small>查看代码，观察实际运行</small></button>
+        <button data-role="testing"><span>检查与验证</span><strong>测试工具</strong><small>检查结果是否符合预期</small></button>
+        <button data-role="delivery"><span>记录与交付</span><strong>版本与发布工具</strong><small>保存变化，让软件可被使用</small></button>
+      </div>
+    </section>
+  </template>
+  <noscript><p class="noscript">此交互样板需要启用 JavaScript。文字与来源也可在 <a href="review.md">设计说明</a>和 <a href="sources.md">来源记录</a>中阅读。</p></noscript>
+  <script>
+
+const CATALOG = {"content":{"schemaVersion":1,"verifiedAt":"2026-09-04","concepts":[{"id":"data-storage","name":"数据存储方案","summary":"把记录留下来，并在需要时找回来。本样板聚焦程序关闭后仍需保留的数据。","why":"以记录待办事项为例：页面关掉后，标题和完成状态还应保留；下次打开，还能只找出未完成的事项。","mechanism":"程序把记录交给存储方案保存，再按条件查询。本次沿关系型数据库这条路径，认识两种具体实现。","boundary":"保存数据不等于必须运行独立数据库服务。普通文件也是一种办法；本样板只展开关系型数据库，不代表存储方案只有这一类。","resourceIds":["sqlite","postgresql"],"sourceIds":["sqlite-about","pg-concepts","pg-architecture"]},{"id":"relational-database","name":"关系型数据库","summary":"用表组织记录，再按条件查询、组合和更新这些记录。","why":"记录变多后，程序需要反复筛选、关联和修改数据，不宜每次都重新编写一套文件查找逻辑。","mechanism":"可以把待办事项组织成一张表：一行是一条事项，列描述标题、完成状态等信息；程序通过 SQL 等接口提出查询和修改要求。","boundary":"这是组织数据的一类方式，SQLite 和 PostgreSQL 是具体实现。同属关系型数据库，不代表 SQL 细节、扩展和部署方式完全兼容。","resourceIds":["sqlite","postgresql"],"sourceIds":["pg-concepts","sqlite-about","pg-about"]},{"id":"embedded-database","name":"嵌入式数据库","summary":"数据库引擎作为库随应用运行，由应用直接调用。","why":"有些软件只需要管理身边的数据，希望运行应用时就能保存记录，减少单独部署服务的工作。","mechanism":"以 SQLite 为例，应用进程内的数据库引擎直接读写本机文件，中间没有独立的数据库服务进程。","boundary":"“嵌入式”说的是引擎如何与应用配合，不是只能用于小程序。SQLite 所说的 serverless 也不同于云厂商代管服务器。","resourceIds":["sqlite"],"sourceIds":["sqlite-serverless","sqlite-uses"]},{"id":"client-server-database","name":"客户端／服务器数据库","summary":"由独立服务管理数据，应用通过连接提出查询和修改请求。","why":"多个应用需要访问同一份数据时，可以把连接、访问权限和数据管理集中交给数据库服务。","mechanism":"以 PostgreSQL 为例，应用是数据库客户端，服务进程管理文件并执行请求；二者既可在同一台电脑，也可通过网络连接。","boundary":"“服务器”是一种运行职责，不等于必须租云主机。网页产品中，访问数据库的客户端也可能是后端应用，而不是浏览器。","resourceIds":["postgresql"],"sourceIds":["pg-architecture","pg-roles","pg-install"]}],"resources":[{"id":"sqlite","name":"SQLite","kind":"嵌入式 SQL 数据库引擎","summary":"把数据库能力装进应用，直接管理本机数据库文件。","purpose":"保存和查询应用记录，常见于手机与桌面软件，也可用于合适的网页应用后端。","environment":"引擎与调用它的程序处在同一进程。用于网页产品时，数据库可在后端机器上，用户通过网页访问应用。","requirements":["应用需要可用的 SQLite 库或对应语言的驱动；所在运行环境可能已经提供。","保存文件时，应用需要相应的文件访问权限；无需另起数据库服务，也无需注册 SQLite 云账号。","本样板讨论 SQLite 核心的本地用法；另外购买的托管产品有各自条件。"],"limits":["同一数据库同一时刻只有一个写入者。能否满足需求取决于写入频率与等待时间，不能仅凭用户数判断。","多台电脑直接同时读写网络共享盘上的同一数据库文件时，应另评估客户端／服务器方案。"],"officialUrl":"https://www.sqlite.org/","sourceIds":["sqlite-about","sqlite-serverless","sqlite-uses"],"verifiedAt":"2026-09-04","conceptIds":["data-storage","relational-database","embedded-database"]},{"id":"postgresql","name":"PostgreSQL","kind":"开源对象关系型数据库系统","summary":"独立运行数据库服务，让应用通过连接访问共同的数据。","purpose":"保存和查询结构化记录，管理多个客户端的连接与权限，并提供可扩展的数据类型和功能。","environment":"可在 Linux、macOS、Windows 等系统运行。数据库服务与应用可以同机，也可以分开部署。","requirements":["需要安装并运行数据库服务，或取得现有实例的连接方式；应用使用相应驱动或客户端。","连接使用数据库角色，并受认证与权限配置控制；数据库角色不等于云平台账号。","可自行安装免费开源核心，无需购买云服务；选择第三方托管时，账号、费用和配额另看服务条款。"],"limits":["相较于把库嵌入应用，需要安排服务运行、连接配置和访问权限。","保存重要数据仍需安排备份与恢复；使用数据库本身不等于已经有恢复保障。"],"officialUrl":"https://www.postgresql.org/","sourceIds":["pg-about","pg-architecture","pg-download","pg-install","pg-roles","pg-backup"],"verifiedAt":"2026-09-04","conceptIds":["data-storage","relational-database","client-server-database"]}],"relations":[{"id":"sqlite-storage","from":"sqlite","to":"data-storage","type":"implements","label":"用于保存和查找记录","condition":"本样板使用持久化的本机数据库文件来说明这一职责。","sourceIds":["sqlite-about"]},{"id":"postgresql-storage","from":"postgresql","to":"data-storage","type":"implements","label":"用于保存和查找记录","condition":"通过数据库服务保存记录，应用建立连接后查询和更新。","sourceIds":["pg-architecture"]},{"id":"sqlite-relational","from":"sqlite","to":"relational-database","type":"implements","label":"提供关系型数据管理","condition":"支持表与 SQL，不表示与其他实现的语法和扩展完全兼容。","sourceIds":["sqlite-about"]},{"id":"postgresql-relational","from":"postgresql","to":"relational-database","type":"implements","label":"提供关系型数据管理","condition":"以关系模型为基础，并提供对象关系特性和扩展能力。","sourceIds":["pg-concepts","pg-about"]},{"id":"sqlite-embedded","from":"sqlite","to":"embedded-database","type":"implements","label":"作为库随应用运行","condition":"此处描述 SQLite 核心，不泛指包装它的远程服务。","sourceIds":["sqlite-serverless"]},{"id":"postgresql-client-server","from":"postgresql","to":"client-server-database","type":"implements","label":"通过独立服务管理数据","condition":"客户端与数据库服务可以部署在同一台机器。","sourceIds":["pg-architecture"]},{"id":"sqlite-postgresql-comparison","from":"sqlite","to":"postgresql","type":"comparable","label":"围绕存储需求比较","condition":"当需求是用 SQL 保存和查询记录时，可比较二者；先看数据位置、同时写入的要求和服务维护安排。同类不等于可直接替换，迁移还需检查语法、类型、扩展和应用代码。","sourceIds":["sqlite-uses","pg-architecture","pg-about"]}],"sources":[{"id":"sqlite-about","title":"SQLite 官方介绍 · About SQLite","url":"https://www.sqlite.org/about.html","checkedAt":"2026-09-04"},{"id":"sqlite-uses","title":"SQLite 官方适用场景 · Appropriate Uses","url":"https://www.sqlite.org/whentouse.html","checkedAt":"2026-09-04"},{"id":"sqlite-serverless","title":"SQLite 无独立服务进程的含义 · Serverless","url":"https://www.sqlite.org/serverless.html","checkedAt":"2026-09-04"},{"id":"pg-about","title":"PostgreSQL 官方介绍 · About","url":"https://www.postgresql.org/about/","checkedAt":"2026-09-04"},{"id":"pg-concepts","title":"PostgreSQL 18 教程 · 关系、表和数据库","url":"https://www.postgresql.org/docs/18/tutorial-concepts.html","checkedAt":"2026-09-04"},{"id":"pg-architecture","title":"PostgreSQL 18 教程 · 客户端／服务器架构","url":"https://www.postgresql.org/docs/18/tutorial-arch.html","checkedAt":"2026-09-04"},{"id":"pg-install","title":"PostgreSQL 18 教程 · 安装","url":"https://www.postgresql.org/docs/18/tutorial-install.html","checkedAt":"2026-09-04"},{"id":"pg-download","title":"PostgreSQL 官方下载 · 平台与安装包","url":"https://www.postgresql.org/download/","checkedAt":"2026-09-04"},{"id":"pg-roles","title":"PostgreSQL 18 手册 · 数据库角色","url":"https://www.postgresql.org/docs/18/database-roles.html","checkedAt":"2026-09-04"},{"id":"pg-backup","title":"PostgreSQL 18 手册 · 备份与恢复","url":"https://www.postgresql.org/docs/18/backup.html","checkedAt":"2026-09-04"}],"routes":[{"id":"home","title":"软件由什么组成","relation":"role","steps":["软件由什么组成","保存和查找信息","数据存储方案"],"conceptId":"data-storage","resourceIds":["sqlite","postgresql"]},{"id":"domains","title":"全域地图","relation":"domain","steps":["全域地图","数据库与存储","数据存储方案"],"conceptId":"data-storage","resourceIds":["sqlite","postgresql"]},{"id":"products","title":"按产品探索","relation":"product","steps":["按产品探索","需要保存记录的网页应用","数据存储方案"],"conceptId":"data-storage","resourceIds":["sqlite","postgresql"]}]},"panorama":[{"name":"软件的构成单位","summary":"你听到的绝大多数名词都在这一组。分界线只有三条：谁调用谁、能不能下载安装、换掉要不要重写。"},{"name":"数据结构","summary":"一堆数据摆成什么形状。形状决定了「找一个」「加一个」「删一个」各要花多少功夫。"},{"name":"算法","summary":"一套固定的步骤，把输入变成输出。名字听着抽象，但每一个都对应着你天天在用的功能。"},{"name":"设计模式","summary":"被反复用出来的代码组织套路。它们不是发明的，是从大量真实代码里认出来的重复形状。"},{"name":"架构风格","summary":"整个系统摆成什么形状，块与块之间怎么说话。比设计模式高一个尺度。"},{"name":"编程范式","summary":"写代码时脑子里的组织方式。同一门语言可以支持好几种。"},{"name":"编程语言家族","summary":"语言不是孤立发明的，是一棵有血缘的树。认出家族，语法就不用一门门背。"},{"name":"语言的构成部件","summary":"任何一门语言拆开都是这些零件。认识零件，看陌生代码就不再是天书。"},{"name":"类型系统","summary":"机器在什么时候、用多严的标准，检查你有没有把东西放错格子。"},{"name":"操作系统","summary":"程序和硬件之间那一层。它管的是：谁能用 CPU、谁能用内存、谁能碰硬盘。"},{"name":"网络与协议","summary":"两台机器之间怎么把话说清楚。分层是这里的核心：每一层只管自己那点事。"},{"name":"数据库与存储","summary":"把数据放住并且还能找回来。不同的数据库不是好坏之分，是为不同的查询形状优化的。"},{"name":"并发与并行","summary":"多件事同时进行时会出的问题，以及应对办法。并发是「交替着做」，并行是「真的同时做」。"},{"name":"从源码到运行","summary":"你写的字，怎么一步步变成机器执行的电信号。这条链路每一段都有专门的名字。"},{"name":"前端","summary":"跑在用户那台机器上、看得见的那一半。核心矛盾是：状态变了，界面怎么跟着变。"},{"name":"后端","summary":"跑在别人机器上、看不见的那一半。核心矛盾是：很多人同时来，怎么不出错、不崩。"},{"name":"交付与基础设施","summary":"代码写完之后到用户能用之间的全部工序。核心是把每一步都变成可重复、可回滚的。"},{"name":"测试","summary":"测试只能证明有问题，不能证明没问题。所以它们的分类，本质是「用多大成本抽多大的样」。"},{"name":"安全","summary":"安全不是一个功能，是一堆「假设别人不怀好意」时才成立的设计。"},{"name":"人工智能与机器学习","summary":"从数据里拟合出一个函数，再把这个函数部署出去用。分成训练侧和推理侧两半。"},{"name":"数据的表示与格式","summary":"同一份东西在机器里的写法。乱码、精度丢失、文件打不开，根源都在这一组。"},{"name":"版本控制与协作","summary":"多个人在同一份代码上动手时的秩序。Git 一家独大，所以这组基本等于 Git 的世界观。"},{"name":"计算机体系结构","summary":"软件之所以有那些约束，根源都在硬件的物理事实上。这一层解释了「为什么快的东西小、大的东西慢」。"},{"name":"理论计算机科学","summary":"关于「什么算得出来、算得多快、能不能证明」的那一层。它划定了工程能做到的边界。"}]};
+
+
+/**
+ * [INPUT]: build.mjs 内联的 CATALOG，template.html 的页面与首页模板。
+ * [OUTPUT]: 软件职责、知识领域、产品用途三个入口，以及共享概念和资源详情。
+ * [POS]: design 的交互协调层；哈希只记录入口/主题/资源身份，正文始终从同一对象读取。
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
+(() => {
+  'use strict';
+  const {content, panorama} = CATALOG;
+  const concepts = new Map(content.concepts.map(c => [c.id, c]));
+  const resources = new Map(content.resources.map(r => [r.id, r]));
+  const sources = new Map(content.sources.map(s => [s.id, s]));
+  const routes = new Map(content.routes.map(r => [r.id, r]));
+  const main = document.getElementById('main');
+  const escape = value => String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  const url = (route, id) => `#${route}/storage${id ? '/' + encodeURIComponent(id) : ''}`;
+  const external = (href, label, className = '') => `<a class="${className}" href="${escape(href)}" target="_blank" rel="noopener noreferrer">${escape(label)} <span aria-hidden="true">↗</span></a>`;
+  const status = ready => `<span class="status${ready ? ' ready' : ''}">${ready ? '已核对来源' : '只有定位 · 待整理'}</span>`;
+
+  // --- 首页部件描述是设计语境，不是项目资源的另一份正文 ---
+  const roles = {
+    storage: {name:'保存和查找信息',question:'点下保存后，记录去哪里？',summary:'页面关闭后，记录可能还需要留下来。程序要有办法保存它，也要能在需要时找回来。',example:'从这一个部件出发，认识两种数据库，以及它们不同的运行方式。'},
+    interface: {name:'界面与入口',question:'人怎样告诉软件要做什么？',summary:'按钮、页面、命令行，都是进入软件的方式。入口接收操作，再把处理结果呈现给人。',example:'手机应用、命令行脚本和网页，可以采用不同的入口。'},
+    logic: {name:'程序逻辑',question:'收到一个操作，接着做什么？',summary:'检查输入、计算结果、安排动作，这些规则决定软件的行为。它们可以在本机运行，也可以由远端程序处理。',example:'“保存记录”可能先检查内容，再调用存储部件。'},
+    network: {name:'与其他系统协作',question:'有些事情，交给谁来做？',summary:'软件可以通过接口请求另一个系统的能力，也可能完全独立工作。需要协作时，再认识协议、接口和数据交换。',example:'调用地图、邮件服务或模型接口，是不同的协作场景。'},
+    runtime: {name:'运行环境',question:'代码在哪里真正执行？',summary:'操作系统、语言运行时和托管环境，为软件提供执行代码与访问资源的条件。不同软件需要的组合不同。',example:'脚本在你的电脑上运行，也可以被部署到另一台机器。'},
+    agent: {name:'人与 Coding Agent',question:'谁来表达目标，谁来检查结果？',summary:'人说明希望解决的问题，Agent 协助生成和修改代码。软件运行后是否符合目标，还需要观察与验证。',example:'这是制作软件的一种方式。用 AI 写代码，并不意味着成品必须带 AI 功能。'},
+    editor: {name:'开发工具',question:'怎样看见并修改正在做的东西？',summary:'编辑器、调试器等工具帮助查看代码、定位问题和观察运行。它们与最终交付的软件承担不同职责。',example:'工具的具体种类、代表项目和适用环境将在后续整理。'},
+    testing: {name:'测试工具',question:'怎样知道改动是否符合预期？',summary:'把需要检查的行为变成可以重复运行的验证。工具执行检查，人仍需决定哪些结果才是正确的。',example:'检查能不能保存、能不能再次读出，是数据功能的具体问题。'},
+    delivery: {name:'版本与发布工具',question:'怎样记录变化，让别人也能使用？',summary:'版本工具记录改动，构建与发布工具帮助准备和交付软件。部署方式取决于软件准备在哪里运行。',example:'交付一个本地文件与运行一个在线服务，需要的安排不同。'}
+  };
+  const products = [
+    {name:'需要保存记录的网页应用',desc:'从待办、笔记等记录出发，认识信息如何留下来。',sample:true},
+    {name:'自动化脚本',desc:'把重复操作交给程序，可能从文件或命令行进入。',detail:'脚本可以处理文件、调用接口，也可能完全不需要网页界面或数据库。'},
+    {name:'手机应用',desc:'围绕手机上的交互、本地数据与设备能力探索。',detail:'应用可能只用本地数据，也可能与远端系统同步。具体资源与组合仍待整理。'},
+    {name:'桌面应用',desc:'从电脑上的窗口、文件和操作系统能力进入。',detail:'桌面应用的运行环境、数据位置与交付方式需要一起考虑，本轮尚未整理完整资源。'},
+    {name:'带 AI 能力的应用',desc:'把模型作为一种能力，接入具体的软件用途。',detail:'模型能力只是其中一部分；界面、数据和运行安排仍由产品需求决定。本轮尚未整理完整资源。'}
+  ];
+  function rolePanel(id) {
+    const role = roles[id];
+    const panel = document.getElementById('role-inspector');
+    if (!panel || !role) return;
+    panel.innerHTML = `<p class="eyebrow">${escape(role.question)}</p><h2>${escape(role.name)}</h2>${status(id === 'storage')}
+      <p>${escape(role.summary)}</p><p class="role-example">${escape(role.example)}</p>
+      ${id === 'storage' ? `<a class="action" href="${url('home')}">走进数据存储方案 <span aria-hidden="true">→</span></a>` : '<p class="incomplete">这一部分先保留位置，具体资源还在整理。可回到「保存和查找信息」体验完整样板。</p>'}`;
+    document.querySelectorAll('[data-role]').forEach(button => {
+      const selected = button.dataset.role === id;
+      button.classList.toggle('selected', selected);
+      button.setAttribute('aria-pressed', String(selected));
+    });
+  }
+  function heading(eyebrow, title, intro) {
+    return `<section class="page-heading"><p class="eyebrow">${escape(eyebrow)}</p><h1>${escape(title)}</h1><p class="intro">${escape(intro)}</p></section>`;
+  }
+  function renderHome() {
+    main.append(document.getElementById('home-template').content.cloneNode(true));
+    rolePanel('storage');
+    main.insertAdjacentHTML('beforeend', sharedRoutes('home'));
+  }
+  function renderDomains() {
+    main.innerHTML = heading('按知识领域找位置', '把视野拉远一点。', '这里保留原有的 24 个域。数据库与存储已接入本轮样板，其余领域继续作为待整理的探索底稿。') +
+      `<div class="overview-layout"><section><div class="domain-list">${panorama.map((domain, index) => {
+        const selected = domain.name === '数据库与存储';
+        const inside = `<span class="ordinal">${String(index + 1).padStart(2,'0')}</span><strong>${escape(domain.name)}</strong>${selected ? '<span class="status ready">含已核对样板</span>' : status(false)}`;
+        return selected ? `<a class="domain-row featured" href="${url('domains')}">${inside}</a>` : `<button class="domain-row" data-domain="${index}">${inside}</button>`;
+      }).join('')}</div><p class="overview-note">“只有定位”表示保留了原型中的名称和一句说明；不代表该领域的全部内容已经核实。</p></section>
+      <aside id="domain-inspector" class="role-inspector" aria-live="polite"><p class="eyebrow">本轮可走通的分支</p><h2>数据库与存储</h2><p>先理解保存和查找信息的职责，再看 SQLite、PostgreSQL 两个具体项目。</p><p class="role-example">你将从领域归属出发，抵达与首页相同的资源。</p><a class="action" href="${url('domains')}">进入存储样板 <span aria-hidden="true">→</span></a></aside></div>` + sharedRoutes('domains');
+  }
+  function renderProducts() {
+    main.innerHTML = heading('按想做的东西找线索', '从一个产品，认识它的部件。', '这些入口帮助你发现可能用到的技术。具体组成随需求而变，本轮先展开有记录保存需求的网页应用。') +
+      `<div class="overview-layout"><section class="product-list">${products.map((product, index) => {
+        const inner = `<span class="ordinal">${String(index + 1).padStart(2,'0')}</span><div><strong>${escape(product.name)}</strong><small>${escape(product.desc)}</small></div><span class="go" aria-hidden="true">${product.sample ? '→' : '+'}</span>`;
+        return product.sample ? `<a class="product-row featured" href="${url('products')}">${inner}</a>` : `<button class="product-row" data-product="${index}">${inner}</button>`;
+      }).join('')}</section><aside id="product-inspector" class="role-inspector" aria-live="polite"><p class="eyebrow">以记录待办为例</p><h2>关掉页面，记录还在。</h2><p>从这个需求进入，看看“保存与查询”部件可以由什么实现。</p><p class="role-example">这里先展开持久化数据，不承诺已经覆盖一个网页应用的全部组成。</p><a class="action" href="${url('products')}">发现相关方案 <span aria-hidden="true">→</span></a></aside></div>` + sharedRoutes('products');
+  }
+  function breadcrumbs(route, resource) {
+    return `<nav class="breadcrumbs" aria-label="当前位置"><a href="#${route.id}">${escape(route.steps[0])}</a><span aria-hidden="true">/</span><span>${escape(route.steps[1])}</span><span aria-hidden="true">/</span>
+      ${resource ? `<a href="${url(route.id)}">${escape(route.steps[2])}</a><span aria-hidden="true">/</span><b>${escape(resource.name)}</b>` : `<b>${escape(route.steps[2])}</b>`}</nav>`;
+  }
+  function sharedRoutes(current, resourceId) {
+    return `<section class="shared-routes" aria-labelledby="route-title"><h2 id="route-title">从哪里进入，都能找到它。</h2><p>职责、领域、产品用途是三种找法。切换入口，内容仍是同一份。</p>
+      <div class="route-diagram">${content.routes.map(route => `<a class="route-branch" href="${url(route.id, resourceId)}" ${route.id === current ? 'aria-current="page"' : ''}><strong>${escape(route.title)}</strong><span>${escape(route.steps[1])} ↓</span></a>`).join('')}</div>
+      <div class="converge"><span>${resourceId ? escape(resources.get(resourceId).name) : content.routes[0].resourceIds.map(id => escape(resources.get(id).name)).join(' / ')} · 同一份资源说明</span></div></section>`;
+  }
+  function conceptNote(concept, relation) {
+    return `<details class="concept-note" data-concept-id="${escape(concept.id)}"><summary>${escape(concept.name)}${relation ? ` · ${escape(relation.label)}` : ''}</summary>
+      <p><strong>为什么需要它：</strong>${escape(concept.why)}</p><p><strong>怎样运作：</strong>${escape(concept.mechanism)}</p><p><strong>边界：</strong>${escape(concept.boundary)}</p>
+      ${relation ? `<p><strong>这条关系的条件：</strong>${escape(relation.condition)}</p>` : ''}
+      <p>依据：${sourceLinks([...new Set([...concept.sourceIds, ...(relation?.sourceIds || [])])])}</p></details>`;
+  }
+  function sourceLinks(ids) {
+    return ids.map(id => { const source = sources.get(id); return external(source.url, source.title); }).join(' · ');
+  }
+  function renderTopic(route) {
+    const concept = concepts.get(route.conceptId);
+    main.innerHTML = breadcrumbs(route) + `<div class="topic-layout"><section>
+      <div class="topic-intro"><p class="eyebrow">${escape(route.steps[1])}</p><h1>${escape(concept.name)}</h1><p>${escape(concept.summary)}</p>
+      <div class="explain-grid"><div><h2>从一个需求开始</h2><p>${escape(concept.why)}</p></div><div><h2>它在软件里的分工</h2><p>${escape(concept.mechanism)}</p></div></div></div>
+      <div class="resource-list"><h2>沿着关系型数据库这条路，认识两个项目</h2>${route.resourceIds.map(id => {
+        const resource = resources.get(id);
+        return `<a class="resource-option" href="${url(route.id, id)}" data-resource-id="${escape(id)}"><div><strong>${escape(resource.name)}</strong><small>${escape(resource.kind)}</small><p>${escape(resource.summary)}</p></div><span class="go" aria-hidden="true">→</span></a>`;
+      }).join('')}</div>${conceptNote(concepts.get('relational-database'))}</section>
+      <aside class="topic-aside"><p class="eyebrow">先辨清边界</p><h2>保存数据，有多种做法。</h2><p>${escape(concept.boundary)}</p>
+      <div class="decision-row"><strong>先问怎样调用数据库</strong><p>由应用进程直接调用引擎，还是连接独立数据库服务？独立服务也可以运行在同一台机器。</p></div>
+      <div class="decision-row"><strong>再问怎样读写</strong><p>同时写入的要求、访问位置和维护安排，都需要与具体需求一起考虑。</p></div>
+      <div class="decision-row"><strong>本轮范围</strong><p>两个资源已核对官方资料。文件、对象存储、缓存等其他分支尚未在样板里展开。</p></div>
+      <div class="decision-row"><strong>查证与继续了解</strong>${sourceLinks(concept.sourceIds)}</div></aside></div>` + sharedRoutes(route.id);
+  }
+  function renderResource(route, resource) {
+    const relations = content.relations.filter(relation => relation.from === resource.id && relation.type === 'implements');
+    const comparison = content.relations.find(relation => relation.type === 'comparable' && [relation.from, relation.to].includes(resource.id));
+    const other = comparison && resources.get(comparison.from === resource.id ? comparison.to : comparison.from);
+    const list = items => `<ul>${items.map(item => `<li>${escape(item)}</li>`).join('')}</ul>`;
+    main.innerHTML = breadcrumbs(route, resource) + `<div class="resource-layout"><article data-object-id="${escape(resource.id)}">
+      <div class="resource-head"><div><p class="eyebrow">具体项目 / 资源</p><h1>${escape(resource.name)}</h1><p class="kind">${escape(resource.kind)}</p></div>${status(true)}</div>
+      <p class="resource-summary">${escape(resource.summary)}</p>
+      <section class="resource-section"><h2>它解决什么问题</h2><p>${escape(resource.purpose)}</p></section>
+      <section class="resource-section"><h2>它在哪里运行</h2><p>${escape(resource.environment)}</p></section>
+      <section class="resource-section"><h2>使用它，需要什么</h2>${list(resource.requirements)}</section>
+      <section class="resource-section"><h2>这些边界值得先知道</h2>${list(resource.limits)}</section>
+      <section class="resource-section"><h2>它在地图里的位置</h2><p>展开一条关系，查看概念解释、适用条件与依据。</p>${relations.map(relation => conceptNote(concepts.get(relation.to), relation)).join('')}</section>
+      </article><aside class="resource-aside"><p class="eyebrow">从地图走向具体项目</p>${external(resource.officialUrl, '打开 ' + resource.name + ' 官方网站', 'action')}<p>地图内容可以离线阅读；外部资料需要联网。</p>
+      <h2>查证依据</h2><ul class="sources-list">${resource.sourceIds.map(id => { const source = sources.get(id); return `<li>${external(source.url, source.title)}</li>`; }).join('')}</ul><p class="source-date">核对日期 ${escape(resource.verifiedAt)} · 官方资料</p>
+      ${other ? `<section class="comparison"><h3>${escape(comparison.label)}</h3><p>${escape(comparison.condition)}</p><a href="${url(route.id, other.id)}">再看看 ${escape(other.name)} →</a><details><summary>比较依据</summary><p>${sourceLinks(comparison.sourceIds)}</p></details></section>` : ''}</aside></div>` + sharedRoutes(route.id, resource.id);
+  }
+  function locationState() {
+    try {
+      const parts = (location.hash.slice(1) || 'home').split('/').map(decodeURIComponent);
+      const [entry, topic, id] = parts;
+      if (!routes.has(entry) || parts.length > 3 || (topic && topic !== 'storage') || (parts.length > 1 && !topic) || (parts.length > 2 && !id)) return null;
+      if (id && !routes.get(entry).resourceIds.includes(id)) return null;
+      return {route:routes.get(entry), topic, id};
+    } catch { return null; }
+  }
+  function render(moveFocus = true) {
+    const state = locationState();
+    main.replaceChildren();
+    document.querySelectorAll('[data-entry]').forEach(link => {
+      if (link.dataset.entry === state?.route.id) link.setAttribute('aria-current','page');
+      else link.removeAttribute('aria-current');
+    });
+    if (!state) {
+      main.innerHTML = '<section class="not-found"><p class="eyebrow">这个位置还没有内容</p><h1>先回到地图入口。</h1><p>链接中的位置不在本轮样板里。你仍可从三个入口找到已整理的存储资源。</p><a class="action" href="#home">回到软件组成 →</a></section>';
+      document.title = '位置未找到 · 计算机世界';
+    } else {
+      const {route, topic, id} = state;
+      if (id) renderResource(route, resources.get(id));
+      else if (topic) renderTopic(route);
+      else if (route.id === 'home') renderHome();
+      else if (route.id === 'domains') renderDomains();
+      else renderProducts();
+      document.title = `${id ? resources.get(id).name : topic ? '数据存储方案' : route.title} · 计算机世界`;
+    }
+    if (moveFocus) { main.focus({preventScroll:true}); window.scrollTo(0,0); }
+  }
+  // --- 一个委托入口管理首页/全域/产品的局部选择，不残留跨面板处理器 ---
+  main.addEventListener('click', event => {
+    const button = event.target.closest('button');
+    if (!button) return;
+    let panel;
+    if (button.dataset.role) { rolePanel(button.dataset.role); panel = document.getElementById('role-inspector'); }
+    else if (button.dataset.domain) {
+      const domain = panorama[Number(button.dataset.domain)];
+      panel = document.getElementById('domain-inspector');
+      panel.innerHTML = `<p class="eyebrow">全景中的一个领域</p><h2>${escape(domain.name)}</h2>${status(false)}<p>${escape(domain.summary)}</p><p class="role-example">这段定位沿用原有原型。具体资源、使用条件与来源还需要整理。</p><a class="action secondary" href="../index.html">打开原有全景原型 ↗</a>`;
+      main.querySelectorAll('[data-domain]').forEach(item => { const selected = item === button; item.classList.toggle('selected',selected); item.setAttribute('aria-pressed',String(selected)); });
+    } else if (button.dataset.product) {
+      const product = products[Number(button.dataset.product)];
+      panel = document.getElementById('product-inspector');
+      panel.innerHTML = `<p class="eyebrow">按产品找线索</p><h2>${escape(product.name)}</h2>${status(false)}<p>${escape(product.detail)}</p><p class="role-example">这条路线尚未整理完整。先从有保存需求的网页应用体验本轮样板。</p><a class="action secondary" href="${url('products')}">进入已整理的样板 →</a>`;
+      main.querySelectorAll('[data-product]').forEach(item => { const selected = item === button; item.classList.toggle('selected',selected); item.setAttribute('aria-pressed',String(selected)); });
+    }
+    if (panel && window.matchMedia('(max-width:800px)').matches) { panel.tabIndex = -1; panel.focus(); }
+  });
+  // --- 跳转到正文只移动焦点，不把元素锚点当成内容路由 ---
+  document.querySelector('.skip').addEventListener('click', event => {
+    event.preventDefault();
+    main.focus();
+  });
+  window.addEventListener('hashchange', () => render());
+  render(false);
+})();
+
+  </script>
+</body>
+</html>

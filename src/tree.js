@@ -1,3 +1,9 @@
+/**
+ * [INPUT]: RAW 节点与 CONTENT 语境快照、SVG 画布、details 的 paint/esc 与 graph 的关联视图接口。
+ * [OUTPUT]: 树布局、选择、搜索、缩放、折叠与 goto；节点选择驱动右侧说明和关联图。
+ * [POS]: 全景的主导航；只管理浏览状态，内容与来源由构建注入并由 details 展示。
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
 const N = RAW.nodes;
 N.forEach(n=>{ n.open = (n.d===0); });
 const FAM = '"PingFang SC","Hiragino Sans GB","Source Han Sans SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif';
@@ -17,7 +23,8 @@ function crumb(n){ const p=[]; let x=N[n.p]; while(x){ p.unshift(x.n); x=(x.p!=n
   return p.slice(1).join(' › '); }
 
 let searching=false, sel=null, graph=true;
-function txt(n){ return (n.n+' '+(n.e||'')+' '+(n.g||'')+' '+(n.m||'')).toLowerCase(); }
+function txt(n){ const context=CONTENT.byNode[n.i]?.context;
+  return [n.n,n.e,n.g,n.m,context?.summary,context?.explanation].filter(Boolean).join(' ').toLowerCase(); }
 
 function visible(){
   const out=[];
@@ -66,7 +73,7 @@ function mkNode(n){
   t.appendChild(document.createTextNode(n.n));
   if(n.e){ const s=document.createElementNS(NS,'tspan'); s.setAttribute('class','en');
     s.setAttribute('dx',9); s.setAttribute('font-size',12.5); s.textContent=n.e; t.appendChild(s); }
-  g.appendChild(t); return g;
+  g.appendChild(t); g.setAttribute('tabindex','0'); g.setAttribute('role','button'); g.setAttribute('aria-label',n.n+(n.c.length?'，展开或查看':'，查看说明')); return g;
 }
 function clsOf(n){ let c='node lv'+Math.min(n.d,3);
   if(!n.c.length) c+=' leaf'; if(n.c.length&&!n.open) c+=' closed';
@@ -81,7 +88,7 @@ function render(src, instant){
   const items=[], dead=[], dl=[];
   vis.forEach(n=>{ let el=nodeEl.get(n.i), en=false;
     if(!el){ el=mkNode(n); gN.appendChild(el); nodeEl.set(n.i,el); n.cx=sox; n.cy=soy; en=true; }
-    el.setAttribute('class',clsOf(n));
+    el.setAttribute('class',clsOf(n)); if(n.c.length) el.setAttribute('aria-expanded',String(n.open));
     items.push({n,el,fx:n.cx,fy:n.cy,tx:n.x,ty:n.y,fo:en?0:(el.__o!=null?el.__o:1),to:opOf(n)}); });
   nodeEl.forEach((el,id)=>{ if(want.has(id))return; const n=N[id];
     items.push({n,el,fx:(n.cx!=null?n.cx:snx),fy:(n.cy!=null?n.cy:sny),tx:snx,ty:sny,
@@ -118,56 +125,40 @@ function render(src, instant){
   applyVP();
 }
 
-// ── 面板 ──────────────────────────────────────────────────────
-const card=document.getElementById('card');
-function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function paint(n){
-  let h='<div class="crumb">'+(crumb(n)||'根')+'</div>';
-  h+='<div class="nm">'+esc(n.n)+'</div>';
-  if(n.e) h+='<div class="en2">'+esc(n.e)+'</div>';
-  h+='<div class="rule"></div>';
-  if(n.g) h+='<div class="gl">'+esc(n.g)+'</div>';
-  if(n.m) h+='<div class="note">'+esc(n.m)+'</div>';
-  // 草稿不美化：释义是起草的，判断句还没定稿，界面上就得说出来
-  if(n.draft) h+='<div class="draftmark">草稿 · 事实已核，判断句待定稿</div>';
-  if(n.c.length) h+='<div class="cnt">罩住 '+n.c.length+' 个'+(n.d===0?'域':n.d===1?'概念':'实体')+'</div>';
-  else if(!n.m) h+='<div class="cnt">到底了，这是一个能指着看的东西</div>';
-  if(n.r && n.r.length){
-    const by={}; n.r.forEach(([j,lab])=>{ (by[lab]=by[lab]||[]).push(j); });
-    let first=true;
-    for(const lab in by){
-      h+='<div class="relh'+(first?' first':'')+'"><b>'+esc(lab)+'</b>　'+by[lab].length+' 个</div>'; first=false;
-      by[lab].forEach(j=>{ const o=N[j];
-        h+='<div class="ri" data-go="'+j+'"><span class="rn">'+esc(o.n)+'</span>'
-         + '<span class="rp">'+esc(crumb(o))+'</span></div>'; });
-    }
-  }
-  card.innerHTML=h;
-  mgShow(n);
-}
-card.addEventListener('click',e=>{ const r=e.target.closest('.ri'); if(!r)return; goto(+r.dataset.go); });
 function reveal(n){ let p=(n.p!=null)?N[n.p]:null; while(p){ p.open=true; p.reveal=true; p=(p.p!=null)?N[p.p]:null; } n.reveal=true; }
 function select(n){
   sel=n;
+  history.replaceState(null,'','#node='+n.i);
   if(graph && n.r) n.r.forEach(([j])=> reveal(N[j]));
   paint(n); render(n);
+  if(matchMedia('(max-width:760px)').matches) card.focus();
 }
-function goto(i){ const n=N[i]; reveal(n); select(n);
-  viewTo((stage.clientWidth-444)/2 - n.y*k, stage.clientHeight/2 - n.x*k, k); }
+function centerNode(n){
+  if(n.i===0){fit();return;}
+  const zoom=Math.min(1.6,Math.max(.85,k));
+  viewTo(stage.clientWidth/2 - n.y*zoom, stage.clientHeight/2 - n.x*zoom, zoom);
+}
+function goto(i){ const n=N[i]; reveal(n); select(n); centerNode(n); }
 
 gN.addEventListener('click', e=>{
   const g=e.target.closest('.node'); if(!g) return;
   const n=N[+g.dataset.id];
-  if(e.target.tagName==='circle' && n.c.length){ n.open=!n.open; if(sel!==n){sel=n; paint(n);} render(n); }
+  if(e.target.tagName==='circle' && n.c.length){ n.open=!n.open; if(sel!==n){sel=n; history.replaceState(null,'','#node='+n.i); paint(n);} render(n); }
   else select(n);
 });
 
 // ── 搜索 / 按钮 / 视图 ────────────────────────────────────────
 const qEl=document.getElementById('q'), hitsEl=document.getElementById('hits');
+qEl.addEventListener('keydown', event => {
+  if (event.key !== 'Enter' || !searching) return;
+  const query = qEl.value.trim().toLowerCase();
+  const node = N.find(item => item.n.toLowerCase() === query || (item.e && item.e.toLowerCase() === query)) || N.find(item => item.hit);
+  if (node) { event.preventDefault(); goto(node.i); }
+});
 qEl.addEventListener('input',()=>{
   const q=qEl.value.trim().toLowerCase();
   N.forEach(n=>{ n.hit=false; n.show=false; n.onpath=false; n.reveal=false; });
-  if(!q){ searching=false; hitsEl.textContent=''; N.forEach(n=>n.open=(n.d===0)); sel=null; card.innerHTML=''; paint(N[0]); render(N[0]); viewTo(70,40,1); return; }
+  if(!q){ history.replaceState(null,'',location.pathname+location.search); searching=false; hitsEl.textContent=''; N.forEach(n=>n.open=(n.d===0)); sel=null; card.innerHTML=''; paint(N[0]); render(N[0]); viewTo(70,40,1); return; }
   searching=true; let c=0;
   N.forEach(n=>{ if(n.d>0 && txt(n).includes(q)){ n.hit=true; c++; } });
   N.forEach(n=>{ if(n.hit){ n.open=false; n.show=true; let p=(n.p!=null)?N[n.p]:null;
@@ -177,6 +168,7 @@ qEl.addEventListener('input',()=>{
 });
 // Esc 有三个去处，按「最贴身的先响应」排：弹层 → 放大 → 清搜索
 document.addEventListener('keydown',e=>{ if(e.key!=='Escape') return;
+  e.preventDefault(); // search 输入框原生 Esc 会清值，必须服从弹层优先顺序。
   if(mgPop.style.display==='block') return;      // 弹层开着，Esc 归弹层（graph.js 里接）
   if(document.body.classList.contains('mgbig')){ mgToggleBig(); return; }
   qEl.value=''; qEl.dispatchEvent(new Event('input')); });
@@ -199,15 +191,35 @@ function viewTo(x,y,z){ if(vraf) cancelAnimationFrame(vraf);
   (function st(now){ const t=ease(Math.min(1,(now-t0)/460));
     tx=lerp(x0,x,t); ty=lerp(y0,y,t); k=lerp(z0,z,t); applyVP();
     if(t<1) vraf=requestAnimationFrame(st); else vraf=null; })(performance.now()); }
-function fit(){ const W=stage.clientWidth-474, H=stage.clientHeight-60;
+function fit(){ const W=Math.max(100,stage.clientWidth-70), H=Math.max(120,stage.clientHeight-70);
   let z=Math.min(W/Math.max(BOX.w,1), H/Math.max(BOX.h,1), 1.6); z=Math.max(z,.06);
   viewTo(40, 30+Math.max(0,(H-BOX.h*z)/2), z); }
-let drag=false,sx=0,sy=0;
-stage.addEventListener('mousedown',e=>{ if(e.target.closest('.node'))return;
-  if(vraf){cancelAnimationFrame(vraf);vraf=null;} drag=true; stage.classList.add('drag'); sx=e.clientX-tx; sy=e.clientY-ty; });
-window.addEventListener('mousemove',e=>{ if(!drag)return; tx=e.clientX-sx; ty=e.clientY-sy; applyVP(); });
-window.addEventListener('mouseup',()=>{ drag=false; stage.classList.remove('drag'); });
+let drag=false,sx=0,sy=0,treePointer=null;
+stage.addEventListener('pointerdown',e=>{ if(e.target.closest('.node,button') || e.button!==0)return;
+  if(vraf){cancelAnimationFrame(vraf);vraf=null;} drag=true; treePointer=e.pointerId; stage.setPointerCapture(treePointer);
+  stage.classList.add('drag'); sx=e.clientX-tx; sy=e.clientY-ty; });
+stage.addEventListener('pointermove',e=>{ if(!drag||treePointer!==e.pointerId)return; tx=e.clientX-sx; ty=e.clientY-sy; applyVP(); });
+function endTreeDrag(e){ if(treePointer!==e.pointerId)return; drag=false;treePointer=null;stage.classList.remove('drag'); }
+stage.addEventListener('pointerup',endTreeDrag);stage.addEventListener('pointercancel',endTreeDrag);stage.addEventListener('lostpointercapture',endTreeDrag);
 stage.addEventListener('wheel',e=>{ e.preventDefault(); if(vraf){cancelAnimationFrame(vraf);vraf=null;}
   const r=stage.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top;
   const nk=Math.min(2.6,Math.max(.03,k*(e.deltaY<0?1.12:1/1.12)));
   tx=mx-(mx-tx)*(nk/k); ty=my-(my-ty)*(nk/k); k=nk; applyVP(); },{passive:false});
+
+// --- 同一节点操作支持键盘；方向键用于展开/收起而不是把图当菜单 ---
+gN.addEventListener('keydown', event => {
+  const el = event.target.closest('.node');
+  if (!el) return;
+  const node = N[Number(el.dataset.id)];
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault(); select(node);
+  } else if (node.c.length && ['ArrowRight', 'ArrowLeft'].includes(event.key)) {
+    event.preventDefault(); node.open = event.key === 'ArrowRight'; render(node);
+  }
+});
+function zoomTree(factor) {
+  const next = Math.min(2.6, Math.max(.03, k * factor));
+  viewTo(stage.clientWidth/2-(stage.clientWidth/2-tx)*(next/k), stage.clientHeight/2-(stage.clientHeight/2-ty)*(next/k), next);
+}
+document.getElementById('zoom-in').addEventListener('click', () => zoomTree(1.25));
+document.getElementById('zoom-out').addEventListener('click', () => zoomTree(.8));

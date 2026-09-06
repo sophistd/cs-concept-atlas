@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-09-04",
+  "concepts": [
+    {
+      "id": "data-storage",
+      "name": "数据存储方案",
+      "summary": "把记录留下来，并在需要时找回来。本样板聚焦程序关闭后仍需保留的数据。",
+      "why": "以记录待办事项为例：页面关掉后，标题和完成状态还应保留；下次打开，还能只找出未完成的事项。",
+      "mechanism": "程序把记录交给存储方案保存，再按条件查询。本次沿关系型数据库这条路径，认识两种具体实现。",
+      "boundary": "保存数据不等于必须运行独立数据库服务。普通文件也是一种办法；本样板只展开关系型数据库，不代表存储方案只有这一类。",
+      "resourceIds": ["sqlite", "postgresql"],
+      "sourceIds": ["sqlite-about", "pg-concepts", "pg-architecture"]
+    },
+    {
+      "id": "relational-database",
+      "name": "关系型数据库",
+      "summary": "用表组织记录，再按条件查询、组合和更新这些记录。",
+      "why": "记录变多后，程序需要反复筛选、关联和修改数据，不宜每次都重新编写一套文件查找逻辑。",
+      "mechanism": "可以把待办事项组织成一张表：一行是一条事项，列描述标题、完成状态等信息；程序通过 SQL 等接口提出查询和修改要求。",
+      "boundary": "这是组织数据的一类方式，SQLite 和 PostgreSQL 是具体实现。同属关系型数据库，不代表 SQL 细节、扩展和部署方式完全兼容。",
+      "resourceIds": ["sqlite", "postgresql"],
+      "sourceIds": ["pg-concepts", "sqlite-about", "pg-about"]
+    },
+    {
+      "id": "embedded-database",
+      "name": "嵌入式数据库",
+      "summary": "数据库引擎作为库随应用运行，由应用直接调用。",
+      "why": "有些软件只需要管理身边的数据，希望运行应用时就能保存记录，减少单独部署服务的工作。",
+      "mechanism": "以 SQLite 为例，应用进程内的数据库引擎直接读写本机文件，中间没有独立的数据库服务进程。",
+      "boundary": "“嵌入式”说的是引擎如何与应用配合，不是只能用于小程序。SQLite 所说的 serverless 也不同于云厂商代管服务器。",
+      "resourceIds": ["sqlite"],
+      "sourceIds": ["sqlite-serverless", "sqlite-uses"]
+    },
+    {
+      "id": "client-server-database",
+      "name": "客户端／服务器数据库",
+      "summary": "由独立服务管理数据，应用通过连接提出查询和修改请求。",
+      "why": "多个应用需要访问同一份数据时，可以把连接、访问权限和数据管理集中交给数据库服务。",
+      "mechanism": "以 PostgreSQL 为例，应用是数据库客户端，服务进程管理文件并执行请求；二者既可在同一台电脑，也可通过网络连接。",
+      "boundary": "“服务器”是一种运行职责，不等于必须租云主机。网页产品中，访问数据库的客户端也可能是后端应用，而不是浏览器。",
+      "resourceIds": ["postgresql"],
+      "sourceIds": ["pg-architecture", "pg-roles", "pg-install"]
+    }
+  ],
+  "resources": [
+    {
+      "id": "sqlite",
+      "name": "SQLite",
+      "kind": "嵌入式 SQL 数据库引擎",
+      "summary": "把数据库能力装进应用，直接管理本机数据库文件。",
+      "purpose": "保存和查询应用记录，常见于手机与桌面软件，也可用于合适的网页应用后端。",
+      "environment": "引擎与调用它的程序处在同一进程。用于网页产品时，数据库可在后端机器上，用户通过网页访问应用。",
+      "requirements": [
+        "应用需要可用的 SQLite 库或对应语言的驱动；所在运行环境可能已经提供。",
+        "保存文件时，应用需要相应的文件访问权限；无需另起数据库服务，也无需注册 SQLite 云账号。",
+        "本样板讨论 SQLite 核心的本地用法；另外购买的托管产品有各自条件。"
+      ],
+      "limits": [
+        "同一数据库同一时刻只有一个写入者。能否满足需求取决于写入频率与等待时间，不能仅凭用户数判断。",
+        "多台电脑直接同时读写网络共享盘上的同一数据库文件时，应另评估客户端／服务器方案。"
+      ],
+      "officialUrl": "https://www.sqlite.org/",
+      "sourceIds": ["sqlite-about", "sqlite-serverless", "sqlite-uses"],
+      "verifiedAt": "2026-09-04",
+      "conceptIds": ["data-storage", "relational-database", "embedded-database"]
+    },
+    {
+      "id": "postgresql",
+      "name": "PostgreSQL",
+      "kind": "开源对象关系型数据库系统",
+      "summary": "独立运行数据库服务，让应用通过连接访问共同的数据。",
+      "purpose": "保存和查询结构化记录，管理多个客户端的连接与权限，并提供可扩展的数据类型和功能。",
+      "environment": "可在 Linux、macOS、Windows 等系统运行。数据库服务与应用可以同机，也可以分开部署。",
+      "requirements": [
+        "需要安装并运行数据库服务，或取得现有实例的连接方式；应用使用相应驱动或客户端。",
+        "连接使用数据库角色，并受认证与权限配置控制；数据库角色不等于云平台账号。",
+        "可自行安装免费开源核心，无需购买云服务；选择第三方托管时，账号、费用和配额另看服务条款。"
+      ],
+      "limits": [
+        "相较于把库嵌入应用，需要安排服务运行、连接配置和访问权限。",
+        "保存重要数据仍需安排备份与恢复；使用数据库本身不等于已经有恢复保障。"
+      ],
+      "officialUrl": "https://www.postgresql.org/",
+      "sourceIds": ["pg-about", "pg-architecture", "pg-download", "pg-install", "pg-roles", "pg-backup"],
+      "verifiedAt": "2026-09-04",
+      "conceptIds": ["data-storage", "relational-database", "client-server-database"]
+    }
+  ],
+  "relations": [
+    {
+      "id": "sqlite-storage",
+      "from": "sqlite",
+      "to": "data-storage",
+      "type": "implements",
+      "label": "用于保存和查找记录",
+      "condition": "本样板使用持久化的本机数据库文件来说明这一职责。",
+      "sourceIds": ["sqlite-about"]
+    },
+    {
+      "id": "postgresql-storage",
+      "from": "postgresql",
+      "to": "data-storage",
+      "type": "implements",
+      "label": "用于保存和查找记录",
+      "condition": "通过数据库服务保存记录，应用建立连接后查询和更新。",
+      "sourceIds": ["pg-architecture"]
+    },
+    {
+      "id": "sqlite-relational",
+      "from": "sqlite",
+      "to": "relational-database",
+      "type": "implements",
+      "label": "提供关系型数据管理",
+      "condition": "支持表与 SQL，不表示与其他实现的语法和扩展完全兼容。",
+      "sourceIds": ["sqlite-about"]
+    },
+    {
+      "id": "postgresql-relational",
+      "from": "postgresql",
+      "to": "relational-database",
+      "type": "implements",
+      "label": "提供关系型数据管理",
+      "condition": "以关系模型为基础，并提供对象关系特性和扩展能力。",
+      "sourceIds": ["pg-concepts", "pg-about"]
+    },
+    {
+      "id": "sqlite-embedded",
+      "from": "sqlite",
+      "to": "embedded-database",
+      "type": "implements",
+      "label": "作为库随应用运行",
+      "condition": "此处描述 SQLite 核心，不泛指包装它的远程服务。",
+      "sourceIds": ["sqlite-serverless"]
+    },
+    {
+      "id": "postgresql-client-server",
+      "from": "postgresql",
+      "to": "client-server-database",
+      "type": "implements",
+      "label": "通过独立服务管理数据",
+      "condition": "客户端与数据库服务可以部署在同一台机器。",
+      "sourceIds": ["pg-architecture"]
+    },
+    {
+      "id": "sqlite-postgresql-comparison",
+      "from": "sqlite",
+      "to": "postgresql",
+      "type": "comparable",
+      "label": "围绕存储需求比较",
+      "condition": "当需求是用 SQL 保存和查询记录时，可比较二者；先看数据位置、同时写入的要求和服务维护安排。同类不等于可直接替换，迁移还需检查语法、类型、扩展和应用代码。",
+      "sourceIds": ["sqlite-uses", "pg-architecture", "pg-about"]
+    }
+  ],
+  "sources": [
+    {"id": "sqlite-about", "title": "SQLite 官方介绍 · About SQLite", "url": "https://www.sqlite.org/about.html", "checkedAt": "2026-09-04"},
+    {"id": "sqlite-uses", "title": "SQLite 官方适用场景 · Appropriate Uses", "url": "https://www.sqlite.org/whentouse.html", "checkedAt": "2026-09-04"},
+    {"id": "sqlite-serverless", "title": "SQLite 无独立服务进程的含义 · Serverless", "url": "https://www.sqlite.org/serverless.html", "checkedAt": "2026-09-04"},
+    {"id": "pg-about", "title": "PostgreSQL 官方介绍 · About", "url": "https://www.postgresql.org/about/", "checkedAt": "2026-09-04"},
+    {"id": "pg-concepts", "title": "PostgreSQL 18 教程 · 关系、表和数据库", "url": "https://www.postgresql.org/docs/18/tutorial-concepts.html", "checkedAt": "2026-09-04"},
+    {"id": "pg-architecture", "title": "PostgreSQL 18 教程 · 客户端／服务器架构", "url": "https://www.postgresql.org/docs/18/tutorial-arch.html", "checkedAt": "2026-09-04"},
+    {"id": "pg-install", "title": "PostgreSQL 18 教程 · 安装", "url": "https://www.postgresql.org/docs/18/tutorial-install.html", "checkedAt": "2026-09-04"},
+    {"id": "pg-download", "title": "PostgreSQL 官方下载 · 平台与安装包", "url": "https://www.postgresql.org/download/", "checkedAt": "2026-09-04"},
+    {"id": "pg-roles", "title": "PostgreSQL 18 手册 · 数据库角色", "url": "https://www.postgresql.org/docs/18/database-roles.html", "checkedAt": "2026-09-04"},
+    {"id": "pg-backup", "title": "PostgreSQL 18 手册 · 备份与恢复", "url": "https://www.postgresql.org/docs/18/backup.html", "checkedAt": "2026-09-04"}
+  ],
+  "routes": [
+    {"id": "home", "title": "软件由什么组成", "relation": "role", "steps": ["软件由什么组成", "保存和查找信息", "数据存储方案"], "conceptId": "data-storage", "resourceIds": ["sqlite", "postgresql"]},
+    {"id": "domains", "title": "全域地图", "relation": "domain", "steps": ["全域地图", "数据库与存储", "数据存储方案"], "conceptId": "data-storage", "resourceIds": ["sqlite", "postgresql"]},
+    {"id": "products", "title": "按产品探索", "relation": "product", "steps": ["按产品探索", "需要保存记录的网页应用", "数据存储方案"], "conceptId": "data-storage", "resourceIds": ["sqlite", "postgresql"]}
+  ]
+}
