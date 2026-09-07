@@ -180,5 +180,6 @@
 - 从公开网址重新加载后，搜索 SQLite 能定位到 `#node=946`，显示完整解释、两条官方资料入口及“用什么语言实现”关系；展开阅读可用，抽查未见脚本错误。
 - 下载公开首页，与已验收的本地 `index.html` 逐字节一致：910,599 字节，SHA256 为 `96867f852a18b2e88d988328c2783830a2467bd933785d101bae4565943e7496`。
 - 读者现在可直接使用 [公开地图](https://sophistd.github.io/cs-concept-atlas/) 或 [SQLite 节点地址](https://sophistd.github.io/cs-concept-atlas/#node=946)。后续内容校核范围仍按第 10 节讨论，发布完成不提升未核对来源的审核状态。
+- 已补齐 GitHub 仓库 About 的 Website 字段，指向公开地图，并重新打开仓库确认右侧显示链接。后续发布同时核对 README 与 About 的访问入口；Pages 部署成功与仓库入口展示需分别确认。
 
 [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
