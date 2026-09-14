@@ -1,7 +1,7 @@
 /**
  * [INPUT]: RAW 节点与 CONTENT 语境快照、SVG 画布、details 的 paint/esc 与 graph 的关联视图接口。
  * [OUTPUT]: 树布局、选择、搜索、缩放、折叠与 goto；节点选择驱动右侧说明和关联图。
- * [POS]: 全景的主导航；只管理浏览状态，内容与来源由构建注入并由 details 展示。
+ * [POS]: 全景的主导航；只管理浏览状态；清搜索保留 #map，介绍页不响应地图 Esc，内容由 details 展示。
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
 const N = RAW.nodes;
@@ -158,7 +158,7 @@ qEl.addEventListener('keydown', event => {
 qEl.addEventListener('input',()=>{
   const q=qEl.value.trim().toLowerCase();
   N.forEach(n=>{ n.hit=false; n.show=false; n.onpath=false; n.reveal=false; });
-  if(!q){ history.replaceState(null,'',location.pathname+location.search); searching=false; hitsEl.textContent=''; N.forEach(n=>n.open=(n.d===0)); sel=null; card.innerHTML=''; paint(N[0]); render(N[0]); viewTo(70,40,1); return; }
+  if(!q){ history.replaceState(null,'','#map'); searching=false; hitsEl.textContent=''; N.forEach(n=>n.open=(n.d===0)); sel=null; card.innerHTML=''; paint(N[0]); render(N[0]); viewTo(70,40,1); return; }
   searching=true; let c=0;
   N.forEach(n=>{ if(n.d>0 && txt(n).includes(q)){ n.hit=true; c++; } });
   N.forEach(n=>{ if(n.hit){ n.open=false; n.show=true; let p=(n.p!=null)?N[n.p]:null;
@@ -168,6 +168,7 @@ qEl.addEventListener('input',()=>{
 });
 // Esc 有三个去处，按「最贴身的先响应」排：弹层 → 放大 → 清搜索
 document.addEventListener('keydown',e=>{ if(e.key!=='Escape') return;
+  if(document.body.classList.contains('intro') || document.body.classList.contains('atlas-mode')) return;
   e.preventDefault(); // search 输入框原生 Esc 会清值，必须服从弹层优先顺序。
   if(mgPop.style.display==='block') return;      // 弹层开着，Esc 归弹层（graph.js 里接）
   if(document.body.classList.contains('mgbig')){ mgToggleBig(); return; }

@@ -1,0 +1,135 @@
+{
+  "_contract": {
+    "INPUT": "经 P06 source 核对的 B01 样例；entries 正文与出处引用",
+    "OUTPUT": "方案、角色、必要条件和检查判据",
+    "POS": "三树公共定义；通过 atlas 编译校验后由当前网站读取",
+    "PROTOCOL": "变更时更新此头部，然后检查 CLAUDE.md"
+  },
+  "formatVersion": 1,
+  "version": "b01-2026-09-13-r2",
+  "solutions": [
+    {
+      "id": "pretrained-inference",
+      "revision": 1,
+      "name": "按已有标签做预训练推理",
+      "variant": {
+        "id": "tv-resnet50-v2",
+        "revision": 1,
+        "name": "TorchVision 0.23 / ResNet50 V2"
+      },
+      "requires": [
+        "label-fit",
+        "input-fit",
+        "runtime-fit"
+      ],
+      "roles": [
+        {
+          "id": "preprocess",
+          "name": "准备输入",
+          "purpose": "将 RGB 图片转为配套张量",
+          "required": true
+        },
+        {
+          "id": "predict",
+          "name": "计算输出",
+          "purpose": "实现加载匹配权重并计算类别分数",
+          "required": true
+        },
+        {
+          "id": "label-map",
+          "name": "解释类别",
+          "purpose": "核对目标标签并按同一权重类别顺序解释输出",
+          "required": true
+        },
+        {
+          "id": "judge",
+          "name": "判断是否有用",
+          "purpose": "以目标照片和事前人工判据检查是否达成目标",
+          "required": true,
+          "scenarioInputs": [
+            "target-photo-set",
+            "human-labels",
+            "target-20"
+          ]
+        }
+      ],
+      "excludes": [
+        "自定义 SKU 的训练或适配实现",
+        "自动批量分类产品",
+        "未知类别拒识",
+        "生产泛化保证",
+        "隐私部署或业务接入",
+        "安装教程"
+      ],
+      "nextWhenUnknown": "先确认未知的必要条件；默认示例先核目标标签。",
+      "claimIds": [
+        "b01:C05",
+        "b01:C06",
+        "b01:C07",
+        "b01:C08",
+        "b01:C09",
+        "b01:C10",
+        "b01:C14",
+        "b01:C15"
+      ],
+      "connectionIds": [
+        "X01",
+        "X02",
+        "X03",
+        "X04"
+      ]
+    }
+  ],
+  "conditions": [
+    {
+      "id": "label-fit",
+      "statement": "目标类别能由指定权重类别表的语义表达",
+      "claimIds": [
+        "b01:C09"
+      ]
+    },
+    {
+      "id": "input-fit",
+      "statement": "已取得并核对适用的 RGB 图片与配套预处理输入规格",
+      "claimIds": [
+        "b01:C07",
+        "b01:C08"
+      ]
+    },
+    {
+      "id": "runtime-fit",
+      "statement": "指定实现、环境和权重匹配且可取得；实际用途的必要条件已核对",
+      "claimIds": [
+        "b01:C05",
+        "b01:C06"
+      ]
+    }
+  ],
+  "criteria": [
+    {
+      "id": "label-check",
+      "scope": "component",
+      "expected": "逐个目标类别确认与类别表的对应；不明确则保持未知。"
+    },
+    {
+      "id": "input-check",
+      "scope": "component",
+      "expected": "固定图片的通道、形状和数值范围符合所选权重配套变换。"
+    },
+    {
+      "id": "run-one-image",
+      "scope": "solution-call",
+      "expected": "记录环境、图片与绑定版本，一次加载和推理输出与类别表长度相符。",
+      "excludes": [
+        "useful-result"
+      ]
+    },
+    {
+      "id": "target-20",
+      "scope": "problem-result",
+      "expected": "事先选定 20 张目标照片，至少 18 张 top-1 与人工目标匹配，并逐张查看错误。",
+      "fictional": true,
+      "notEvidenceOf": "文献标准、推荐阈值、生产泛化或已测结果"
+    }
+  ]
+}

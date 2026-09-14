@@ -1,0 +1,248 @@
+{
+  "_contract": {
+    "INPUT": "经 P06 source 核对的 B01 样例；entries 正文与出处引用",
+    "OUTPUT": "显式虚构的条件、选择/接入和分层检查；不接收访问者个人状态",
+    "POS": "三树公共定义；通过 atlas 编译校验后由当前网站读取",
+    "PROTOCOL": "变更时更新此头部，然后检查 CLAUDE.md"
+  },
+  "formatVersion": 1,
+  "version": "b01-2026-09-13-r2",
+  "scenarios": [
+    {
+      "id": "photo-A",
+      "revision": 1,
+      "fictional": true,
+      "name": "教学情境 A：先核标签",
+      "problem": "photo-classify",
+      "solution": "pretrained-inference",
+      "solutionRevision": 1,
+      "variant": "tv-resnet50-v2",
+      "conditionValues": {
+        "label-fit": "unknown",
+        "input-fit": "unknown",
+        "runtime-fit": "unknown"
+      },
+      "provided": "虚构人物已备好 RGB 照片，尚未核对目标标签与实现环境。",
+      "usage": [
+        {
+          "role": "predict",
+          "binding": "explain-v15",
+          "selection": "chosen",
+          "activity": "not_started",
+          "scenarioRef": "photo-A",
+          "scenarioRevision": 1,
+          "solution": "pretrained-inference",
+          "solutionRevision": 1,
+          "variant": "tv-resnet50-v2",
+          "variantRevision": 1
+        },
+        {
+          "role": "predict",
+          "binding": "run-tv",
+          "selection": "undecided",
+          "activity": "not_started",
+          "blocker": "实现与环境尚未确定",
+          "scenarioRef": "photo-A",
+          "scenarioRevision": 1,
+          "solution": "pretrained-inference",
+          "solutionRevision": 1,
+          "variant": "tv-resnet50-v2",
+          "variantRevision": 1
+        },
+        {
+          "role": "predict",
+          "binding": "load-v2",
+          "selection": "chosen",
+          "activity": "not_started",
+          "blocker": "权重尚未取得",
+          "scenarioRef": "photo-A",
+          "scenarioRevision": 1,
+          "solution": "pretrained-inference",
+          "solutionRevision": 1,
+          "variant": "tv-resnet50-v2",
+          "variantRevision": 1
+        }
+      ],
+      "assessments": [],
+      "next": "先核对类别映射，确定目标能否表达，再确认实现环境。",
+      "actorRef": "fictional-example-person",
+      "version": "b01-2026-09-13-r2",
+      "variantRevision": 1
+    },
+    {
+      "id": "photo-B",
+      "revision": 1,
+      "fictional": true,
+      "name": "教学情境 B：调用通过仍要检查结果",
+      "problem": "photo-classify",
+      "solution": "pretrained-inference",
+      "solutionRevision": 1,
+      "variant": "tv-resnet50-v2",
+      "conditionValues": {
+        "label-fit": "true",
+        "input-fit": "true",
+        "runtime-fit": "true"
+      },
+      "provided": "教学假设：所需条件已核对，实现与权重已经接入，一张图有输出。",
+      "usage": [
+        {
+          "role": "predict",
+          "binding": "run-tv",
+          "selection": "chosen",
+          "activity": "awaiting_check",
+          "assessmentRefs": [
+            "fictional-call-pass"
+          ],
+          "scenarioRef": "photo-B",
+          "scenarioRevision": 1,
+          "solution": "pretrained-inference",
+          "solutionRevision": 1,
+          "variant": "tv-resnet50-v2",
+          "variantRevision": 1
+        },
+        {
+          "role": "predict",
+          "binding": "load-v2",
+          "selection": "chosen",
+          "activity": "awaiting_check",
+          "assessmentRefs": [
+            "fictional-call-pass"
+          ],
+          "scenarioRef": "photo-B",
+          "scenarioRevision": 1,
+          "solution": "pretrained-inference",
+          "solutionRevision": 1,
+          "variant": "tv-resnet50-v2",
+          "variantRevision": 1
+        }
+      ],
+      "assessments": [
+        {
+          "id": "fictional-call-pass",
+          "scope": "solution-call",
+          "criterion": "run-one-image",
+          "result": "pass",
+          "fictional": true,
+          "evidence": "教学假设，没有真实运行证据",
+          "scenarioRef": "photo-B",
+          "scenarioRevision": 1,
+          "solution": "pretrained-inference",
+          "solutionRevision": 1,
+          "variant": "tv-resnet50-v2",
+          "input": {
+            "id": "fictional-photo-01",
+            "fictional": true,
+            "description": "教学 RGB 图片；无实际文件"
+          },
+          "environment": {
+            "fictional": true,
+            "description": "假设与指定实现兼容且已核对的本机环境；未提供真实安装或运行证据"
+          },
+          "variantRevision": 1,
+          "conditionValues": {
+            "label-fit": "true",
+            "input-fit": "true",
+            "runtime-fit": "true"
+          },
+          "bindingVersions": [
+            {
+              "binding": "preprocess-v2",
+              "object": "b01:tv-v2-preprocess",
+              "objectVersion": "v0.23.0 / ResNet50_Weights.IMAGENET1K_V2.transforms()"
+            },
+            {
+              "binding": "run-tv",
+              "object": "b01:tv-resnet50-023",
+              "objectVersion": "v0.23.0 / torchvision.models.resnet50"
+            },
+            {
+              "binding": "load-v2",
+              "object": "b01:tv-resnet50-v2-weights",
+              "objectVersion": "ResNet50_Weights.IMAGENET1K_V2 / resnet50-11ad3fa6.pth"
+            },
+            {
+              "binding": "map-v2",
+              "object": "b01:tv-v2-labels",
+              "objectVersion": "v0.23.0 / V2 weights.meta[categories]"
+            }
+          ]
+        },
+        {
+          "id": "fictional-result-pending",
+          "scope": "problem-result",
+          "criterion": "target-20",
+          "result": "not-checked",
+          "fictional": true,
+          "scenarioRef": "photo-B",
+          "scenarioRevision": 1,
+          "solution": "pretrained-inference",
+          "solutionRevision": 1,
+          "variant": "tv-resnet50-v2",
+          "input": {
+            "id": "fictional-photo-01",
+            "fictional": true,
+            "description": "教学 RGB 图片；无实际文件"
+          },
+          "environment": {
+            "fictional": true,
+            "description": "假设与指定实现兼容且已核对的本机环境；未提供真实安装或运行证据"
+          },
+          "variantRevision": 1,
+          "conditionValues": {
+            "label-fit": "true",
+            "input-fit": "true",
+            "runtime-fit": "true"
+          },
+          "bindingVersions": [
+            {
+              "binding": "preprocess-v2",
+              "object": "b01:tv-v2-preprocess",
+              "objectVersion": "v0.23.0 / ResNet50_Weights.IMAGENET1K_V2.transforms()"
+            },
+            {
+              "binding": "run-tv",
+              "object": "b01:tv-resnet50-023",
+              "objectVersion": "v0.23.0 / torchvision.models.resnet50"
+            },
+            {
+              "binding": "load-v2",
+              "object": "b01:tv-resnet50-v2-weights",
+              "objectVersion": "ResNet50_Weights.IMAGENET1K_V2 / resnet50-11ad3fa6.pth"
+            },
+            {
+              "binding": "map-v2",
+              "object": "b01:tv-v2-labels",
+              "objectVersion": "v0.23.0 / V2 weights.meta[categories]"
+            }
+          ]
+        }
+      ],
+      "next": "用预选的 20 张目标照片和事前判据判断结果，逐张查看错误；不能说 CNN 已学会。",
+      "actorRef": "fictional-example-person",
+      "version": "b01-2026-09-13-r2",
+      "variantRevision": 1
+    },
+    {
+      "id": "photo-sku",
+      "revision": 1,
+      "fictional": true,
+      "name": "反例：改为自家商品 SKU",
+      "problem": "photo-classify",
+      "solution": "pretrained-inference",
+      "solutionRevision": 1,
+      "variant": "tv-resnet50-v2",
+      "conditionValues": {
+        "label-fit": "false",
+        "input-fit": "unknown",
+        "runtime-fit": "unknown"
+      },
+      "provided": "假设目标 SKU 无法由所选权重类别表表达。",
+      "usage": [],
+      "assessments": [],
+      "next": "本变体不适用于这个目标。先明确标签、数据与评估，再比较适配或训练等方案；本轮不实施该分支。",
+      "actorRef": "fictional-example-person",
+      "version": "b01-2026-09-13-r2",
+      "variantRevision": 1
+    }
+  ]
+}

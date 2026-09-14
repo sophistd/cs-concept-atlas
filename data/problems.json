@@ -1,0 +1,68 @@
+{
+  "_contract": {
+    "INPUT": "经 P06 source 核对的 B01 样例；entries 正文与出处引用",
+    "OUTPUT": "问题分解与期望结果；不复制知识正文",
+    "POS": "三树公共定义；通过 atlas 编译校验后由当前网站读取",
+    "PROTOCOL": "变更时更新此头部，然后检查 CLAUDE.md"
+  },
+  "formatVersion": 1,
+  "version": "b01-2026-09-13-r2",
+  "problems": [
+    {
+      "id": "photo-classify",
+      "name": "给照片输出有用的目标类别",
+      "obstacle": "照片已备好，尚不知道一组预训练类别能否表达目标，也未验证输入、调用与结果。",
+      "desiredOutcome": "照片能够按事先定义的类别目标得到经检查可用的结果。",
+      "allOf": [
+        "labels",
+        "input",
+        "inference",
+        "useful-result"
+      ],
+      "claimIds": [
+        "b01:C14",
+        "b01:C15"
+      ]
+    },
+    {
+      "id": "labels",
+      "name": "目标类别能否表达",
+      "desiredOutcome": "目标标签和指定权重类别表有可解释的对应。",
+      "criterion": "label-check",
+      "claimIds": [
+        "b01:C09"
+      ]
+    },
+    {
+      "id": "input",
+      "name": "图片能否成为所需输入",
+      "desiredOutcome": "RGB 图片按该权重配套变换得到通道、形状、数值范围符合要求的输入。",
+      "criterion": "input-check",
+      "claimIds": [
+        "b01:C07",
+        "b01:C08"
+      ]
+    },
+    {
+      "id": "inference",
+      "name": "怎样算出类别输出",
+      "desiredOutcome": "固定环境中实现加载匹配权重，对固定图片返回与类别表长度相符的输出。",
+      "criterion": "run-one-image",
+      "claimIds": [
+        "b01:C05",
+        "b01:C06",
+        "b01:C10"
+      ]
+    },
+    {
+      "id": "useful-result",
+      "name": "输出是否适合这批照片",
+      "desiredOutcome": "按事前选定的目标照片和人工判据检查结果，并逐张查看错误。",
+      "criterion": "target-20",
+      "claimIds": [
+        "b01:C14",
+        "b01:C15"
+      ]
+    }
+  ]
+}

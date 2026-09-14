@@ -11,6 +11,10 @@
 - checkedAt 只记录实际打开核对页面的日期，省略表示待核验。HTTP 可用不证明资料支持解释；日期也不等于整条内容已获审核。
 - 只有显式“同一个东西”关系共用基础说明，代表为最小原节点编号。其余位置的不同正文和来源作为领域语境补充保留，不能当重复垃圾删掉。
 - 根构建检查每个非根节点都存在正文与来源、引用有效、身份匹配。同名或同类不会自动合并。
+- 可选 objectEntries 是没有新 raw 落点的对象正文正本，以独立 id/name/summary/explanation/sourceIds 维护；data/objects.json 只引用正文，不另写一份解释。
+- 可选 claims 逐项记录 statement、objectIds、原审核 locator/supportScope 和 evidence 的逐来源 sourceId/locator/scope；总限定与单一来源支持范围同时保留。来源支持与项目教学定义用 basisKind 分开，后者只引用公共 planning 定义，不伪造外部证据。
+- 新来源的 trace 保留 version/publisher/kind/locator/availability 与 rights；固定 Git 位置使用 commit/permalink/gitBlob。rights 只授权当前保留的链接、事实元数据和原创解释，原件排除；代码许可不能自动用于权重。
+- 编译对扩展和来源逐层使用字段白名单，拒绝私有或未知字段；来源 ID 编译为“领域编号:局部 ID”。旧文件缺省扩展产生空索引，仍由同一 compileContent 入口处理。
 
 ## 成员清单
 
@@ -33,12 +37,12 @@
 - `17-delivery.json`: 交付与基础设施的解释与资料，领域编号 1267，覆盖 56 个原节点。
 - `18-testing.json`: 测试的解释与资料，领域编号 1323，覆盖 60 个原节点。
 - `19-security.json`: 安全的解释与资料，领域编号 1383，覆盖 61 个原节点。
-- `20-machine-learning.json`: 人工智能与机器学习的解释与资料，领域编号 1444，覆盖 81 个原节点。
+- `20-machine-learning.json`: 人工智能与机器学习的解释与资料，领域编号 1444，覆盖 81 个原节点；B01 修订 CNN，新增 9 份独立正文、10 个固定来源、15 条主张。
 - `21-formats.json`: 数据的表示与格式的解释与资料，领域编号 1525，覆盖 66 个原节点。
 - `22-collaboration.json`: 版本控制与协作的解释与资料，领域编号 1591，覆盖 47 个原节点。
 - `23-hardware.json`: 计算机体系结构的解释与资料，领域编号 1638，覆盖 52 个原节点。
 - `24-theory.json`: 理论计算机科学的解释与资料，领域编号 1690，覆盖 49 个原节点。
 
-内容修订后运行 `node build.mjs` 与 `node build.mjs --check`；字段守卫的回归入口为 `node scripts/content-checks.mjs`。JSON 只含数据，契约与归属记录在本文件。
+内容修订后由集成者运行 `node build.mjs` 与 `node build.mjs --check`；字段守卫的回归入口为 `node scripts/content-checks.mjs` 与 `node scripts/atlas-checks.mjs`。JSON 只含数据，契约与归属记录在本文件；B01 扩展文件另带 _contract，不进入公共编译结果。
 
 [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md

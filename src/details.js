@@ -1,5 +1,5 @@
 /**
- * [INPUT]: 树导航的 N/crumb/goto、CONTENT 的逐节点来源映射、graph 的 mgShow。
+ * [INPUT]: 树导航、CONTENT 正文与来源、graph 的 mgShow，以及 ATLAS 的可选旧节点映射。
  * [OUTPUT]: paint/esc 与来源、上层概念、子节点、跨领域关系组成的唯一详情面板。
  * [POS]: 选择节点后的阅读入口；同网址合并支撑范围与核对日期，外链仅在点击时访问。
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
@@ -35,6 +35,12 @@ function detailSources(node) {
         '<small>'+(source.checkedAt ? '页面核对 '+esc(source.checkedAt) : '参考链接 · 尚待逐页核验')+'</small></a>';
     }).join('')+'<p class="source-note">资料用于核查与延伸阅读；列出链接不等于每条解释都已完成审阅。打开外部资料需要联网。</p></section>';
 }
+function detailAtlasEntries(node) {
+  if(typeof ATLAS==='undefined') return '';
+  const objects=ATLAS.indexes.rawObjects[node.i] || [];
+  if(!objects.length) return '';
+  return '<section class="atlas-node-entry"><h3>放进一个具体问题里看</h3>'+objects.map(id=>'<a href="#atlas=photo-A&amp;object='+encodeURIComponent(id)+'">'+esc(ATLAS.objects[id].name)+'怎样用于照片分类 ↗</a>').join('')+'<p>从同一对象查看方案角色、必要条件与依据；教学情境不代表真实项目已经完成。</p></section>';
+}
 function paint(node) {
   const entry = CONTENT.byNode[node.i];
   const ancestors = [];
@@ -57,6 +63,7 @@ function paint(node) {
       if (extra) html += '<section class="detail-copy"><h3>在这个位置的用法</h3>'+extra+'</section>';
     }
     html += detailSources(node);
+    html += detailAtlasEntries(node);
     const concept = node.d > 1 ? N[node.p] : null;
     if (concept) html += '<details class="detail-context"><summary>上层'+(concept.t==='group'?'领域':'概念')+'：'+esc(concept.n)+'</summary><p>'+esc(concept.g)+'</p>'+detailParagraphs(concept.m)+detailLink(concept, '回到上层，查看其他组成或例子')+'</details>';
     if (entry?.locations.length > 1) html += '<details class="detail-context"><summary>同一对象在 '+entry.locations.length+' 个位置出现</summary><p>各处共享基础说明，并补充它在当前领域的用法。位置和相邻关系随领域变化。</p>'+entry.locations.filter(id => id !== node.i).map(id => detailLink(N[id], crumb(N[id]))).join('')+'</details>';

@@ -1,32 +1,13 @@
 /**
- * [INPUT]: 原分类节点与各领域条目文件；只读取本地 JSON，不抓取或改写来源。
- * [OUTPUT]: 导出 compileContent/readContent，产生含解释的浏览器节点快照、来源索引与覆盖统计。
+ * [INPUT]: 原分类节点与各领域条目文件；依赖 validation 和 atlas-content 核验可选三树正文与来源。
+ * [OUTPUT]: 导出 compileContent/readContent，产生浏览器节点、来源、可选 objectEntries/claims 与覆盖统计。
  * [POS]: 构建前的内容边界；核对节点身份、所属领域、引用与完整覆盖，同一对象在浏览器复用正文。
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
  */
 import {readFileSync, readdirSync} from 'node:fs';
 import {join} from 'node:path';
-
-const fail = (path, message) => { throw new Error(`${path}: ${message}`); };
-function string(value, path, minimum = 1) {
-  if (typeof value !== 'string' || value.trim().length < minimum) fail(path, `需要至少 ${minimum} 个字符的说明`);
-}
-function array(value, path) {
-  if (!Array.isArray(value)) fail(path, '需要数组');
-}
-function object(value, path) {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) fail(path, '需要对象');
-}
-function validDate(value, path) {
-  if (value === undefined) return;
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || !Number.isFinite(Date.parse(value)) ||
-      new Date(value).toISOString().slice(0, 10) !== value) fail(path, '核对日期应是有效的 YYYY-MM-DD');
-}
-function validUrl(value, path) {
-  let url;
-  try { url = new URL(value); } catch { fail(path, '需要完整资料地址'); }
-  if (!['https:', 'http:'].includes(url.protocol) || url.username || url.password) fail(path, '只接受普通 HTTP(S) 资料链接');
-}
+import {fail,string,array,object,validDate,validUrl,shape,validateContract} from './validation.mjs';
+import {checkedSource,compileContentExtensions} from './atlas-content.mjs';
 
 // --- 分类先过身份与父子关系检查，避免正文挂到错误的节点 ---
 export function validateNodes(nodes) {
@@ -52,8 +33,10 @@ export function validateNodes(nodes) {
 export function compileContent(nodes, documents) {
   validateNodes(nodes);
   const entries = new Map(), sources = {}, domains = new Set();
+  const extensions={objectEntries:Object.create(null),claims:Object.create(null)};
   for (const {filename, data} of documents) {
-    object(data, filename);
+    shape(data, filename, 'domain name sources entries objectEntries? claims? _contract?');
+    validateContract(data._contract,`${filename}._contract`);
     const domain = nodes[data.domain];
     if (!domain || domain.t !== 'group' || domain.n !== data.name) fail(filename, '领域身份与分类库不符');
     if (domains.has(domain.i)) fail(filename, '领域重复');
@@ -70,11 +53,14 @@ export function compileContent(nodes, documents) {
       string(source.scope, `${filename}.${source.id}.scope`);
       validUrl(source.url, `${filename}.${source.id}.url`);
       validDate(source.checkedAt, `${filename}.${source.id}.checkedAt`);
-      sources[`${domain.i}:${source.id}`] = {...source};
+      sources[`${domain.i}:${source.id}`] = checkedSource(source,`${filename}.${source.id}`);
     }
+    if(data.objectEntries!==undefined) array(data.objectEntries,`${filename}.objectEntries`);
+    if(data.claims!==undefined) array(data.claims,`${filename}.claims`);
+    compileContentExtensions(data,domain.i,filename,localSources,extensions);
     for (const entry of data.entries) {
       const at = `${filename} #${entry.node}`;
-      object(entry, at);
+      shape(entry, at, 'node name summary explanation sourceIds');
       const node = nodes[entry.node];
       if (!Number.isInteger(entry.node) || !node || node.n !== entry.name) fail(at, '条目编号/名称与分类库不符');
       let owner = node;
@@ -128,7 +114,7 @@ export function compileContent(nodes, documents) {
       byNode[id] = {canonical, sourceIds:entry.sourceIds, locations:members, ...(context ? {context} : {})};
     }
   }
-  return {nodes:enriched, content:{sources, byNode, coverage:{
+  return {nodes:enriched, content:{sources, byNode, ...extensions, coverage:{
     domains:domains.size, entries:entries.size,
     leaves:nodes.filter(node => !node.c.length).length,
     sources:Object.keys(sources).length,

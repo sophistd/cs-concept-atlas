@@ -1,0 +1,186 @@
+{
+  "_contract": {
+    "INPUT": "经 P06 source 核对的 B01 样例；entries 正文与出处引用",
+    "OUTPUT": "对象种类、版本、旧节点身份与正文引用",
+    "POS": "三树公共定义；通过 atlas 编译校验后由当前网站读取",
+    "PROTOCOL": "变更时更新此头部，然后检查 CLAUDE.md"
+  },
+  "formatVersion": 1,
+  "version": "b01-2026-09-13-r2",
+  "objects": [
+    {
+      "id": "b01:cnn",
+      "name": "卷积网络 CNN",
+      "kind": "model-family",
+      "version": "concept-definition-1",
+      "rawNodes": [
+        {
+          "node": 1453,
+          "name": "卷积网络 CNN"
+        }
+      ],
+      "bodyRef": {
+        "node": 1453
+      },
+      "claimIds": [
+        "b01:C01",
+        "b01:C02"
+      ]
+    },
+    {
+      "id": "b01:resnet",
+      "name": "ResNet 残差网络家族",
+      "kind": "model-family",
+      "version": "original image ResNet family",
+      "rawNodes": [],
+      "bodyRef": {
+        "id": "b01:resnet"
+      },
+      "claimIds": [
+        "b01:C02",
+        "b01:C03"
+      ]
+    },
+    {
+      "id": "b01:resnet50",
+      "name": "ResNet-50 原论文架构",
+      "kind": "model-architecture",
+      "version": "arXiv:1512.03385v1 Table 1",
+      "rawNodes": [],
+      "bodyRef": {
+        "id": "b01:resnet50"
+      },
+      "claimIds": [
+        "b01:C03"
+      ]
+    },
+    {
+      "id": "b01:resnet50-v15",
+      "name": "ResNet-50 V1.5 变体",
+      "kind": "model-architecture",
+      "version": "TorchVision 0.23 documented V1.5",
+      "rawNodes": [],
+      "bodyRef": {
+        "id": "b01:resnet50-v15"
+      },
+      "claimIds": [
+        "b01:C04"
+      ]
+    },
+    {
+      "id": "b01:tv-resnet50-023",
+      "name": "TorchVision 0.23 resnet50 实现",
+      "kind": "code-implementation",
+      "version": "v0.23.0 / torchvision.models.resnet50",
+      "rawNodes": [],
+      "bodyRef": {
+        "id": "b01:tv-resnet50-023"
+      },
+      "claimIds": [
+        "b01:C04",
+        "b01:C05",
+        "b01:C10"
+      ]
+    },
+    {
+      "id": "b01:tv-resnet50-v2-weights",
+      "name": "ResNet50 IMAGENET1K_V2 权重",
+      "kind": "model-weights",
+      "version": "ResNet50_Weights.IMAGENET1K_V2 / resnet50-11ad3fa6.pth",
+      "rawNodes": [],
+      "bodyRef": {
+        "id": "b01:tv-resnet50-v2-weights"
+      },
+      "claimIds": [
+        "b01:C05",
+        "b01:C06",
+        "b01:C09",
+        "b01:C13"
+      ],
+      "artifact": {
+        "url": "https://download.pytorch.org/models/resnet50-11ad3fa6.pth",
+        "availability": "not-checked",
+        "downloaded": false,
+        "sha256": null,
+        "rights": "not-determined",
+        "distribution": "excluded"
+      }
+    },
+    {
+      "id": "b01:tv-v2-preprocess",
+      "name": "V2 权重配套预处理",
+      "kind": "code-implementation",
+      "version": "v0.23.0 / ResNet50_Weights.IMAGENET1K_V2.transforms()",
+      "rawNodes": [],
+      "bodyRef": {
+        "id": "b01:tv-v2-preprocess"
+      },
+      "claimIds": [
+        "b01:C07",
+        "b01:C08"
+      ]
+    },
+    {
+      "id": "b01:tv-v2-labels",
+      "name": "V2 权重类别映射",
+      "kind": "documentation",
+      "version": "v0.23.0 / V2 weights.meta[categories]",
+      "rawNodes": [],
+      "bodyRef": {
+        "id": "b01:tv-v2-labels"
+      },
+      "claimIds": [
+        "b01:C09"
+      ]
+    },
+    {
+      "id": "b01:resnet-paper",
+      "name": "Deep Residual Learning for Image Recognition",
+      "kind": "paper",
+      "version": "arXiv:1512.03385v1 / 2015-12-10",
+      "rawNodes": [],
+      "bodyRef": {
+        "id": "b01:resnet-paper"
+      },
+      "claimIds": [
+        "b01:C02",
+        "b01:C03",
+        "b01:C12"
+      ]
+    },
+    {
+      "id": "b01:author-caffe-release",
+      "name": "ResNet 作者 Caffe 转换发布物",
+      "kind": "code-implementation",
+      "version": "commit a7026cb6d478e131b765b898c312e25f9f6dc031 / 2016-07-29",
+      "rawNodes": [],
+      "bodyRef": {
+        "id": "b01:author-caffe-release"
+      },
+      "claimIds": [
+        "b01:C11",
+        "b01:C12"
+      ]
+    },
+    {
+      "id": "b01:pytorch",
+      "name": "PyTorch",
+      "kind": "software-project",
+      "version": "existing-project-entry",
+      "rawNodes": [
+        {
+          "node": 23,
+          "name": "PyTorch"
+        },
+        {
+          "node": 1446,
+          "name": "PyTorch"
+        }
+      ],
+      "bodyRef": {
+        "node": 23
+      },
+      "claimIds": []
+    }
+  ]
+}

@@ -1,0 +1,379 @@
+{
+  "_contract": {
+    "INPUT": "经 P06 source 核对的 B01 样例；entries 正文与出处引用",
+    "OUTPUT": "问题覆盖、角色绑定、协作连接和有依据的对象关系；反向索引仅派生",
+    "POS": "三树公共定义；通过 atlas 编译校验后由当前网站读取",
+    "PROTOCOL": "变更时更新此头部，然后检查 CLAUDE.md"
+  },
+  "formatVersion": 1,
+  "version": "b01-2026-09-13-r2",
+  "bindings": [
+    {
+      "id": "preprocess-v2",
+      "variant": "tv-resnet50-v2",
+      "role": "preprocess",
+      "object": "b01:tv-v2-preprocess",
+      "use": "performs",
+      "requires": [
+        "input-fit"
+      ],
+      "variantRevision": 1
+    },
+    {
+      "id": "explain-cnn",
+      "variant": "tv-resnet50-v2",
+      "role": "predict",
+      "object": "b01:cnn",
+      "use": "explains",
+      "requires": [
+        "label-fit",
+        "runtime-fit"
+      ],
+      "variantRevision": 1
+    },
+    {
+      "id": "explain-resnet",
+      "variant": "tv-resnet50-v2",
+      "role": "predict",
+      "object": "b01:resnet",
+      "use": "explains",
+      "requires": [
+        "runtime-fit"
+      ],
+      "variantRevision": 1
+    },
+    {
+      "id": "explain-spec",
+      "variant": "tv-resnet50-v2",
+      "role": "predict",
+      "object": "b01:resnet50",
+      "use": "explains",
+      "requires": [
+        "runtime-fit"
+      ],
+      "variantRevision": 1
+    },
+    {
+      "id": "explain-v15",
+      "variant": "tv-resnet50-v2",
+      "role": "predict",
+      "object": "b01:resnet50-v15",
+      "use": "explains",
+      "requires": [
+        "runtime-fit"
+      ],
+      "variantRevision": 1
+    },
+    {
+      "id": "run-tv",
+      "variant": "tv-resnet50-v2",
+      "role": "predict",
+      "object": "b01:tv-resnet50-023",
+      "use": "performs",
+      "requires": [
+        "runtime-fit"
+      ],
+      "variantRevision": 1
+    },
+    {
+      "id": "load-v2",
+      "variant": "tv-resnet50-v2",
+      "role": "predict",
+      "object": "b01:tv-resnet50-v2-weights",
+      "use": "performs",
+      "requires": [
+        "runtime-fit"
+      ],
+      "variantRevision": 1
+    },
+    {
+      "id": "map-v2",
+      "variant": "tv-resnet50-v2",
+      "role": "label-map",
+      "object": "b01:tv-v2-labels",
+      "use": "performs",
+      "requires": [
+        "label-fit"
+      ],
+      "variantRevision": 1
+    }
+  ],
+  "coverage": [
+    {
+      "id": "cover-labels",
+      "problem": "labels",
+      "variant": "tv-resnet50-v2",
+      "roles": [
+        "label-map"
+      ],
+      "requires": [
+        "label-fit"
+      ],
+      "criterion": "label-check",
+      "claimIds": [
+        "b01:C09"
+      ],
+      "excludes": [],
+      "variantRevision": 1
+    },
+    {
+      "id": "cover-input",
+      "problem": "input",
+      "variant": "tv-resnet50-v2",
+      "roles": [
+        "preprocess"
+      ],
+      "requires": [
+        "input-fit"
+      ],
+      "criterion": "input-check",
+      "claimIds": [
+        "b01:C07",
+        "b01:C08"
+      ],
+      "excludes": [],
+      "variantRevision": 1
+    },
+    {
+      "id": "cover-inference",
+      "problem": "inference",
+      "variant": "tv-resnet50-v2",
+      "roles": [
+        "predict"
+      ],
+      "requires": [
+        "runtime-fit",
+        "input-fit"
+      ],
+      "criterion": "run-one-image",
+      "claimIds": [
+        "b01:C05",
+        "b01:C06",
+        "b01:C10"
+      ],
+      "excludes": [
+        "useful-result"
+      ],
+      "variantRevision": 1
+    },
+    {
+      "id": "cover-useful-result",
+      "problem": "useful-result",
+      "variant": "tv-resnet50-v2",
+      "roles": [
+        "judge"
+      ],
+      "requires": [
+        "label-fit",
+        "runtime-fit",
+        "input-fit"
+      ],
+      "criterion": "target-20",
+      "claimIds": [
+        "b01:C14",
+        "b01:C15"
+      ],
+      "excludes": [],
+      "variantRevision": 1
+    }
+  ],
+  "connections": [
+    {
+      "id": "X01",
+      "from": {
+        "kind": "role",
+        "id": "preprocess"
+      },
+      "to": {
+        "kind": "role",
+        "id": "predict"
+      },
+      "meaning": "RGB 图片经变换成为输入张量",
+      "constraint": "同一 V2 配套输入；通道/形状/数值范围核对",
+      "claimIds": [
+        "b01:C07",
+        "b01:C08",
+        "b01:C10"
+      ],
+      "variant": "tv-resnet50-v2",
+      "variantRevision": 1
+    },
+    {
+      "id": "X02",
+      "from": {
+        "kind": "binding",
+        "id": "load-v2"
+      },
+      "to": {
+        "kind": "binding",
+        "id": "run-tv"
+      },
+      "meaning": "指定实现加载指定权重参数",
+      "constraint": "模型结构、参数形状和命名匹配；实际加载未执行",
+      "claimIds": [
+        "b01:C05",
+        "b01:C06"
+      ],
+      "variant": "tv-resnet50-v2",
+      "variantRevision": 1,
+      "relationId": "R05"
+    },
+    {
+      "id": "X03",
+      "from": {
+        "kind": "role",
+        "id": "predict"
+      },
+      "to": {
+        "kind": "role",
+        "id": "label-map"
+      },
+      "meaning": "输出位置按权重类别顺序解释",
+      "constraint": "同一权重的 1,000 类输出顺序",
+      "claimIds": [
+        "b01:C09",
+        "b01:C10"
+      ],
+      "variant": "tv-resnet50-v2",
+      "variantRevision": 1
+    },
+    {
+      "id": "X04",
+      "from": {
+        "kind": "role",
+        "id": "label-map"
+      },
+      "to": {
+        "kind": "role",
+        "id": "judge"
+      },
+      "meaning": "类别名称与分数进入目标样本判断",
+      "constraint": "事先目标与人工判据；不把高分当结果正确",
+      "claimIds": [
+        "b01:C14",
+        "b01:C15"
+      ],
+      "variant": "tv-resnet50-v2",
+      "variantRevision": 1
+    }
+  ],
+  "relations": [
+    {
+      "id": "R01",
+      "from": "b01:resnet",
+      "type": "family-subtype-of",
+      "to": "b01:cnn",
+      "claimIds": [
+        "b01:C01",
+        "b01:C02"
+      ],
+      "supportScope": "按关联主张的限定；正反向从此单一记录派生。",
+      "review": "source-reviewed"
+    },
+    {
+      "id": "R02",
+      "from": "b01:resnet50",
+      "type": "architecture-spec-of",
+      "to": "b01:resnet",
+      "claimIds": [
+        "b01:C03"
+      ],
+      "supportScope": "按关联主张的限定；正反向从此单一记录派生。",
+      "review": "source-reviewed"
+    },
+    {
+      "id": "R03",
+      "from": "b01:resnet50-v15",
+      "type": "variant-of",
+      "to": "b01:resnet50",
+      "claimIds": [
+        "b01:C04"
+      ],
+      "supportScope": "按关联主张的限定；正反向从此单一记录派生。",
+      "review": "source-reviewed"
+    },
+    {
+      "id": "R04",
+      "from": "b01:tv-resnet50-023",
+      "type": "implements",
+      "to": "b01:resnet50-v15",
+      "claimIds": [
+        "b01:C04",
+        "b01:C05"
+      ],
+      "supportScope": "按关联主张的限定；正反向从此单一记录派生。",
+      "review": "source-reviewed"
+    },
+    {
+      "id": "R05",
+      "from": "b01:tv-resnet50-v2-weights",
+      "type": "loadable-by",
+      "to": "b01:tv-resnet50-023",
+      "claimIds": [
+        "b01:C05",
+        "b01:C06"
+      ],
+      "supportScope": "按关联主张的限定；正反向从此单一记录派生。",
+      "review": "source-reviewed"
+    },
+    {
+      "id": "R06",
+      "from": "b01:resnet-paper",
+      "type": "proposes-evaluates",
+      "to": "b01:resnet",
+      "claimIds": [
+        "b01:C02",
+        "b01:C12"
+      ],
+      "supportScope": "按关联主张的限定；正反向从此单一记录派生。",
+      "review": "source-reviewed"
+    },
+    {
+      "id": "R07",
+      "from": "b01:resnet-paper",
+      "type": "proposes-evaluates",
+      "to": "b01:resnet50",
+      "claimIds": [
+        "b01:C03",
+        "b01:C12"
+      ],
+      "supportScope": "按关联主张的限定；正反向从此单一记录派生。",
+      "review": "source-reviewed"
+    },
+    {
+      "id": "R08",
+      "from": "b01:author-caffe-release",
+      "type": "converted-release-of",
+      "to": "b01:resnet50",
+      "claimIds": [
+        "b01:C11"
+      ],
+      "supportScope": "按关联主张的限定；正反向从此单一记录派生。",
+      "review": "source-reviewed"
+    },
+    {
+      "id": "R09",
+      "from": "b01:tv-resnet50-v2-weights",
+      "type": "preprocessing-for",
+      "to": "b01:tv-v2-preprocess",
+      "claimIds": [
+        "b01:C06",
+        "b01:C07",
+        "b01:C08"
+      ],
+      "supportScope": "按关联主张的限定；正反向从此单一记录派生。",
+      "review": "source-reviewed"
+    },
+    {
+      "id": "R10",
+      "from": "b01:tv-resnet50-v2-weights",
+      "type": "category-order-for",
+      "to": "b01:tv-v2-labels",
+      "claimIds": [
+        "b01:C09"
+      ],
+      "supportScope": "按关联主张的限定；正反向从此单一记录派生。",
+      "review": "source-reviewed"
+    }
+  ]
+}

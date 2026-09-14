@@ -2,21 +2,22 @@
 
 原生 JavaScript + SVG + JSON + Node 标准库构建；交付自包含 HTML。
 
-> L1 项目地图。当前决定以 `intent.md` 为准；新设计样板与既有全景原型并存。
+> L1 项目地图。当前可用入口与边界见 `README.md`；`intent.md` 保留公开历史决定，独立设计样板继续保留。
 
 ## 当前边界与目录
 
-当前首页保留原有可折叠树与关联图。每个非根节点由 data/entries 提供定位、解释与资料入口；基础内容覆盖不等于完成事实审核。三入口设计保留在 design/ 供继续讨论，尚不替代首页。允许外链、产品入口与解释类贡献；本地内容保持离线可读。
+当前无锚点首页为浅色介绍，四项导航进入概念地图、学习路线预览、资料导航与训练筹备；照片分类入口打开问题—方案—知识三树样例。#map 保留原可折叠树和关联图，旧 #node=N 仍直达原节点。每个非根节点由 data/entries 提供解释与来源；基础覆盖不等于全库事实审核。三种使用情境均明确虚构，不记录个人状态，未执行模型推理或取得真人理解证据。design/ 保留独立三入口样板，本地内容可离线阅读。
 
 | 位置 | 职责 |
 |---|---|
 | `design/` | 独立设计样板、共享内容、官方来源、贡献模板与校验；先读 `design/CLAUDE.md`。 |
-| `src/` | 全景的页面、树、独立详情、关联图、图标与启动源码；先读 src/CLAUDE.md。 |
-| `data/` | 分类与组合保留数组下标；entries/ 按领域维护当前解释和来源。 |
+| `src/` | 首访、原树/详情/关联图与三树样例源码，共用本地路由和知识；先读 src/CLAUDE.md。 |
+| `data/` | 分类与组合保留数组下标；entries/ 管正文与逐主张来源，objects/problems/solutions/mappings/scenarios 五份定义引用同一正文。 |
 | `drafts/` | 历史长释义草稿，合并后写回旧数据；当前页面正文以 entries/ 为准。 |
-| `scripts/` | 内容编译与回归检查、草稿合并、组合候选和图标提取。 |
+| `scripts/` | 正文和三树编译、条件/版本/公共字段校验与回归检查，以及既有维护工具。 |
+| `planning/` | 仅3份公共模型、教学范围与来源依据；先读 planning/CLAUDE.md。 |
 | `index.html`、`build.mjs` | 既有原型的生成产物与内联构建，产物提交入库，不手改。 |
-| `intent.md` | 现行产品与共建决定；§9 为维护讨论约定，§10 为提案与待决问题，§11 记录现有新版发布范围与验收；历史说明留在 `design/previous-intent.md`。 |
+| `intent.md` | 保留此前公开的产品与共建决定；§11 是早期全景发布记录，当前首页/三树范围以 README 为准。 |
 | `README.md`、`CONTRIBUTING.md` | 启动与审阅入口、公开贡献与维护者审核规则。 |
 | `LICENSE`、`LICENSE-CONTENT` | 代码与原创内容的许可边界。 |
 
@@ -28,9 +29,12 @@
 node design/build.mjs          # 独立生成 design/index.html
 node design/build.mjs --check  # 样板结构、脚本语法及产物同步，只读
 node design/checks.mjs         # 内容校验器的拒绝用例
-node build.mjs            # src/ + 分类/组合 + entries/ → index.html
+node build.mjs            # src/ + 分类/组合 + entries/ + 三树定义 → index.html
 node build.mjs --check    # 内容全覆盖、引用、脚本语法与产物同步
 node scripts/content-checks.mjs
+node scripts/entry-checks.mjs         # 首访/样例/旧路由与自包含边界
+node scripts/atlas-checks.mjs         # 类型、条件、版本和公共字段边界
+node scripts/atlas-reading-checks.mjs # 三树详情与来源往返
 node scripts/reading-checks.mjs      # 阅读、语境搜索与来源合并回归
 node scripts/graph-checks.mjs
 python3 scripts/maintenance-checks.py
@@ -56,7 +60,7 @@ node scripts/extract-icons.mjs        # → src/icons.js（要本地有 lucide-r
 
 ## 交付形态决定了一切约束
 
-既有产物是根目录 `index.html`；本轮新增产物是 `design/index.html`。两者各自自包含，加载页面时不请求外部资源，主动打开资料链接时才联网。
+当前交付为根目录 `index.html`；独立设计样板为 `design/index.html`。两者各自自包含，加载页面时不请求外部资源，主动打开资料链接时才联网。
 拆成 `src/` 多文件**只是为了改得动**，不是为了让浏览器分开加载。
 
 由此推出三条硬约束：
@@ -76,10 +80,16 @@ node scripts/extract-icons.mjs        # → src/icons.js（要本地有 lucide-r
 注入顺序就是执行顺序，**不能乱**：
 
 ```
-data → content → bundles → icons.js → tree.js → details.js → graph.js → boot.js
+data → content → atlas → bundles → icons.js → tree.js → details.js → graph.js → entry.js → atlas.js → boot.js
 ```
 
-## ⚠️ 五个 JS 文件共享同一个全局词法作用域
+## 三树编译与路由
+
+`scripts/atlas.mjs` 的 readAtlas 读取同一 content 结果和五份公共定义，内联生成 ATLAS。正反索引保留 binding/coverage/relation 的原 ID；情境 evaluation 在编译阶段产生，浏览器只读，不另写判定算法或保存个人状态。普通资料链接在用户主动打开时才联网，样式、脚本、字体回退及页面数据均本地自包含。
+
+`#atlas=photo-A` 打开教学样例；对象、绑定、角色、问题、主张、来源、关系、连接与判据可在同一情境内往返。`#entry-routes`、`#entry-resources`、`#entry-training` 定位首页真实区段，`#map` 和旧 `#node=N` 保持。只有当前视图可交互；隐藏地图不接收 Esc 或零尺寸布局。样例的未知条件、调用结果与问题结果独立，虚构通过不等于本项目实测。
+
+## ⚠️ 浏览器 JS 文件共享同一个全局词法作用域
 
 **没有模块、没有 import/export。** 它们被内联进同一个 `<script>`，靠顶层 `const`/`function`
 进入全局词法环境互相看见。这意味着：

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * [INPUT]: src 模板与交互、分类/组合数据、data/entries 的逐节点解释和来源。
+ * [INPUT]: src 模板与交互、分类/组合及逐节点正文；atlas 的三树编译与 offline 自包含守卫。
  * [OUTPUT]: 校验后生成根 index.html；--check 检查产物同步且不写文件，--watch 监听源文件。
  * [POS]: 全景的唯一交付入口；复用 content 校验边界，不向分类或条目正本回写。
  * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
@@ -13,6 +13,8 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Script } from 'node:vm';
 import { readContent } from './scripts/content.mjs';
+import { assertOfflineHtml } from './scripts/offline.mjs';
+import { readAtlas } from './scripts/atlas.mjs';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const read = (...p) => readFileSync(join(root, ...p), 'utf8');
@@ -37,17 +39,23 @@ function build() {
   const bundles = JSON.parse(read('data', 'bundles.json'));
   checkBundles(data.nodes, bundles);
   const enriched = readContent(data.nodes, join(root, 'data', 'entries'));
+  const atlas = readAtlas(enriched, join(root, 'data'));
   enriched.nodes[0].g = '沿着领域、概念和具体条目探索。每个节点都有基础说明，相关资料可以继续打开阅读。';
   const inline = value => JSON.stringify(value).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
   const parts = {
     'style.css': read('src', 'style.css'),
+    'entry.css': read('src', 'entry.css'),
+    'atlas.css': read('src', 'atlas.css'),
     'data': 'const RAW = ' + inline({nodes:enriched.nodes}) + ';',
     'content': 'const CONTENT = ' + inline(enriched.content) + ';',
+    'atlas': 'const ATLAS = ' + inline(atlas) + ';',
     'bundles': 'const BUNDLES = ' + inline(bundles) + ';',
     'icons.js': read('src', 'icons.js'),
     'tree.js': read('src', 'tree.js'),
     'details.js': read('src', 'details.js'),
     'graph.js': read('src', 'graph.js'),
+    'entry.js': read('src', 'entry.js'),
+    'atlas.js': read('src', 'atlas.js'),
     'boot.js': read('src', 'boot.js'),
   };
   let html = read('src', 'index.html');
@@ -59,7 +67,7 @@ function build() {
   const left = html.match(/\/\*@inject [^*]+\*\//);
   if (left) throw new Error(`还有没填的注入点：${left[0]}`);
   for (const [,script] of html.matchAll(/<script>([\s\S]*?)<\/script>/g)) new Script(script, {filename:'index.html'});
-  if (/<(?:script|img)\b[^>]*\bsrc\s*=|<link\b[^>]*\bhref\s*=/i.test(html)) throw new Error('首页必须自包含；资料地址请使用普通链接。');
+  assertOfflineHtml(html);
   if (process.argv.includes('--check')) {
     if (read('index.html') !== html) throw new Error('根 index.html 与源文件不同，请先 node build.mjs');
     console.log('全景内容、引用、脚本语法与产物同步检查通过。', enriched.content.coverage);
