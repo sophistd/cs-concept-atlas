@@ -1,0 +1,40 @@
+# [INPUT]: pull_request 事件的 head/base 分支和仓库身份。
+# [OUTPUT]: branch-policy 检查结论；不运行 PR 代码或发布。
+# [POS]: 服务端 PR 方向护栏，配合受保护分支的 required status check。
+# [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+name: Branch policy
+on:
+  pull_request:
+    branches: [main, develop]
+    types: [opened, synchronize, reopened, edited, ready_for_review]
+permissions:
+  contents: read
+jobs:
+  branch-policy:
+    runs-on: ubuntu-latest
+    env:
+      BASE_BRANCH: ${{ github.base_ref }}
+      HEAD_BRANCH: ${{ github.head_ref }}
+      HEAD_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+      BASE_REPOSITORY: ${{ github.repository }}
+    steps:
+      - name: Check pull request direction
+        shell: bash
+        run: |
+          set -eu
+          if [ "$BASE_BRANCH" = main ]; then
+            if [ "$HEAD_BRANCH" != develop ] || [ "$HEAD_REPOSITORY" != "$BASE_REPOSITORY" ]; then
+              echo 'main only accepts release pull requests from this repository develop branch.' >&2
+              exit 1
+            fi
+          elif [ "$BASE_BRANCH" = develop ]; then
+            case "$HEAD_BRANCH" in
+              main|develop|pre-public|feat/curate-bundles-icons|codex/local-planning|codex/b01-first-visit-three-trees)
+                echo 'develop only accepts public task branches.' >&2
+                exit 1
+                ;;
+            esac
+          else
+            echo 'Unexpected integration target.' >&2
+            exit 1
+          fi
