@@ -18,7 +18,7 @@
 | `data/` | 分类与组合保留数组下标；entries/ 管正文与逐主张来源，objects/problems/solutions/mappings/scenarios 五份定义引用同一正文。 |
 | `drafts/` | 历史长释义草稿，合并后写回旧数据；当前页面正文以 entries/ 为准。 |
 | `scripts/` | 正文和三树编译、条件/版本/公共字段校验与回归检查，以及既有维护工具。 |
-| `planning/` | 仅3份公共模型、教学范围与来源依据；先读 planning/CLAUDE.md。 |
+| `planning/` | 公共模型、教学范围、来源依据与 B01 可复验验收包；先读 planning/CLAUDE.md。 |
 | `index.html`、`build.mjs` | 既有原型的生成产物与内联构建，产物提交入库，不手改。 |
 | `intent.md` | 保留此前公开的产品与共建决定；§11 是早期全景发布记录，当前首页/三树范围以 README 为准。 |
 | `README.md`、`CONTRIBUTING.md` | 启动与审阅入口、公开贡献与维护者审核规则。 |
