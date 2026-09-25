@@ -6,7 +6,7 @@
 
 ## 当前边界与目录
 
-分支契约见 [BRANCHING.md](BRANCHING.md)：任务从 develop 开出并向 develop 提 PR；main 只接 develop 的已授权发布。`.github/workflows/` 检查 PR 方向；本地内部规划与历史分支不得进入公开提交。
+分支契约见 [BRANCHING.md](BRANCHING.md)：主目录固定检出 develop、只做同步；任务在 `_local/worktrees/<名>` 开工作树，从 develop 开出并向 develop 提 PR，合入后删分支与工作树；main 只接 develop 的已授权发布。`.github/workflows/` 检查 PR 方向；本地内部规划与历史分支不得进入公开提交。
 
 当前无锚点首页为浅色介绍，四项导航进入概念地图、学习路线预览、资料导航与训练筹备；照片分类入口打开问题—方案—知识三树样例。#map 保留原可折叠树和关联图，旧 #node=N 仍直达原节点。每个非根节点由 data/entries 提供解释与来源；基础覆盖不等于全库事实审核。三种使用情境均明确虚构，不记录个人状态，未执行模型推理或取得真人理解证据。design/ 保留独立三入口样板，本地内容可离线阅读。
 

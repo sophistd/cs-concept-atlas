@@ -13,6 +13,15 @@
 develop → 任务分支 → PR 到 develop → 集成验证 → 发布 PR 到 main
 ```
 
+## 主目录与工作树
+
+2026-09-25 起，`develop` 是本仓库的主线：
+
+- **主目录（仓库根）固定检出 `develop`**，只用来同步和查看：`git fetch origin` 后 `git merge --ff-only origin/develop`。不在主目录改文件，也不在主目录切到别的分支。
+- **每个任务在仓库内开独立工作树**：放在 `_local/worktrees/<名>`（`_local/` 已忽略），一个任务一条分支，不再开到仓库外面。
+- **任务 PR 合入 develop 之后就收尾**：删除远端与本地任务分支，`git worktree remove` 移除工作树；主目录快进到最新的 `origin/develop`。
+- 发布仍是 `develop → main` 的 PR；合进 develop 不等于发布。
+
 | 分支 | 职责 | 进入方式 |
 | --- | --- | --- |
 | `main` | 已发布候选；GitHub Pages 继续沿用 main / 根目录 | 仅由 develop 的发布 PR 进入，发布前核对授权和候选证据 |
@@ -29,7 +38,7 @@ develop → 任务分支 → PR 到 develop → 集成验证 → 发布 PR 到 m
 git status --short
 git fetch origin
 # 把任务名和目录替换为本次实际值；目录必须不存在。
-git worktree add -b codex/task-name ../cs-atlas-task-name origin/develop
+git worktree add -b codex/task-name _local/worktrees/task-name origin/develop
 ```
 
 只提交本任务允许的文件。提交前检查 diff 和相关 L3/L2/L1 文档；源码/内容变更还需构建根 index.html，并完成相关检查。公开候选不可包含内部原始记录、个人回答、凭据或未获授权的私人材料。
@@ -37,7 +46,7 @@ git worktree add -b codex/task-name ../cs-atlas-task-name origin/develop
 ## 审阅、集成与发布
 
 1. 推送时显式写出任务分支，禁止 `--all`、`--mirror`、强制推送或顺带推送历史分支。
-2. 任务 PR 的目标固定为 `develop`，即使 GitHub 默认分支仍为 main，也必须显式指定目标；相关检查通过后集成。保持提交历史可追溯，不改写已共享分支。
+2. 任务 PR 的目标固定为 `develop`（GitHub 默认分支已是 develop），仍建议显式指定目标；相关检查通过后集成。保持提交历史可追溯，不改写已共享分支。
 3. 发布前从 develop 准备最终候选及验收证据，再创建 `develop → main` PR。合入 main 会影响公开版本，必须属于该次已授权发布范围。
 4. 将合并、部署、在线字节核对、浏览器检查和真人验收分别记录。进入 develop 不代表发布，进入 main 不代替产品验收。
 
@@ -45,15 +54,15 @@ git worktree add -b codex/task-name ../cs-atlas-task-name origin/develop
 
 ## 本地内部材料与历史分支
 
-`_local/` 保持忽略。`codex/local-planning` 仅用于容纳当前本机的内部规划工作，不是公开集成线，也不向 origin 推送；需要进入产品的内容必须经过明确选取和去标识审阅，从任务分支交付。
+`_local/` 保持忽略。`codex/local-planning` 仅用于容纳内部规划工作，不是公开集成线，不向 origin 推送，只备份在私有远端；需要进入产品的内容必须经过明确选取和去标识审阅，从任务分支交付。
 
-`pre-public` 和 `feat/curate-bundles-icons` 属于发布前的本地历史，不能推送或合并进公开分支。旧工作树即使分支已被合并，也可能仍有未提交内容；删除前必须分别核对提交和文件，不能仅凭 branch --merged 判断可删。
+`pre-public` 和 `feat/curate-bundles-icons` 属于发布前的历史，只备份在私有远端，不能推送或合并进公开分支。旧工作树即使分支已被合并，也可能仍有未提交内容；删除前必须分别核对提交和文件，不能仅凭 branch --merged 判断可删。
 
 ## 护栏与能力边界
 
 本仓库的 `Branch policy / branch-policy` 工作流验证 PR 方向：任务 → develop、develop → main。它本身不授予发布权限，不替代源码检查，也不会自动合并。
 
-服务端应为 main/develop 要求 PR，禁止强推与删除，并要求该检查通过。管理员可将默认分支设为 develop，GitHub Pages 发布源仍保持 main / 根目录。默认分支与发布源是两个独立设置。
+服务端已为 main/develop 要求 PR 与 `branch-policy` 检查，并禁止强推（2026-09-25 回读）；默认分支已设为 develop，GitHub Pages 发布源仍是 main / 根目录。默认分支与发布源是两个独立设置。
 
 本地 hooks 可以防误操作，但不会自动传播到其他 clone，也不能替代 GitHub 保护规则。服务端配置是否实际生效，必须通过 API 或设置页面另行回读，不能因为文档写了就称为已启用。
 
